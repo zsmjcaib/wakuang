@@ -7,8 +7,8 @@ def find_line(df, df_line):
     if (len(df) < 3):
         return
 
-    __find(df, df_line)
-    df_line.to_csv(target_file, index=0)
+    df = __find(df, df_line)
+    return df
 
 
 def __find(df, df_line):
@@ -249,3 +249,4 @@ if __name__ == '__main__':
 
 
                 find_line(df, df_line)
+                df_line.to_csv(target_path +file_code, index=0)
