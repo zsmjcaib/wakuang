@@ -2,17 +2,11 @@ import pandas as pd
 import os
 
 
-def find_line(file, target_file):
-    df = pd.read_csv(file)
+def find_line(df, df_line):
+
     if (len(df) < 3):
         return
-    if not os.path.exists(target_file):
-        file_object = open(target_file, 'w+')
-        list = (
-                "date" + "," + "key" + "," + "flag" + ",temp" + "\n")
-        file_object.writelines(list)
-        file_object.close()
-    df_line = pd.read_csv(target_file)
+
     __find(df, df_line)
     df_line.to_csv(target_file, index=0)
 
@@ -244,4 +238,14 @@ if __name__ == '__main__':
         target_path = 'D:\project\data\stock\\line\\' + i + '\\'
         for file_code in os.listdir(path):
             if file_code not in os.listdir(target_path):
-                find_line(path + file_code, target_path + file_code)
+                df = pd.read_csv(path + file_code)
+                if not os.path.exists(target_path+file_code):
+                    file_object = open(target_path+file_code, 'w+')
+                    list = (
+                            "date" + "," + "key" + "," + "flag" + ",temp" + "\n")
+                    file_object.writelines(list)
+                    file_object.close()
+                df_line = pd.read_csv(target_path+file_code)
+
+
+                find_line(df, df_line)

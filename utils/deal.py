@@ -2,19 +2,20 @@ import pandas as pd
 import os
 
 
-def find_point(file, target_file):
+def find_point(df, df_point):
 
-    df = pd.read_csv(file)
-    if not os.path.exists(target_file):
-        file_object = open(target_file, 'w+')
-        list = (
-                "date" + "," + "key" + ","  + "flag" + ",temp"+"\n")
-        file_object.writelines(list)
-        file_object.close()
-    df_point = pd.read_csv(target_file)
+    # df = pd.read_csv(file)
+    # if not os.path.exists(target_file):
+    #     file_object = open(target_file, 'w+')
+    #     list = (
+    #             "date" + "," + "key" + ","  + "flag" + ",temp"+"\n")
+    #     file_object.writelines(list)
+    #     file_object.close()
+    # df_point = pd.read_csv(target_file)
     df_point = find(df,df_point)
-    if df_point is not None:
-        df_point.to_csv(target_file, index=0)
+    # if df_point is not None:
+    #     df_point.to_csv(target_file, index=0)
+    return df_point
 
 
 def  find(df, df_point):
@@ -123,7 +124,17 @@ if __name__ == '__main__':
     path = 'D:\project\data\stock\simple\\5\\'
     target_path = 'D:\project\data\stock\\deal\\5\\'
     file_code = '002627.csv'
-    find_point(path + file_code, target_path + file_code)
+    df = pd.read_csv(path + file_code)
+    if not os.path.exists(target_path + file_code):
+        file_object = open(target_path + file_code, 'w+')
+        list = (
+                "date" + "," + "key" + ","  + "flag" + ",temp"+"\n")
+        file_object.writelines(list)
+        file_object.close()
+    df_point = pd.read_csv(target_path + file_code)
+    df_point = find_point(df, df_point)
+    df_point.to_csv(target_path + file_code, index=0)
+
 
 
     # target = ['5']

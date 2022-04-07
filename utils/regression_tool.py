@@ -1,6 +1,11 @@
 import pandas as pd
 import talib
 import yaml
+from utils.point import simpleTrend
+from utils.deal import find_point
+from utils.line import find_line
+from utils.strategy_1 import strategy_test
+import os
 
 
 
@@ -68,12 +73,26 @@ def stock_macd(df) -> pd.DataFrame:
 def test(path,code,content):
     real_data = pd.read_csv(path + code)
     test_normal_5_path = content['test_normal_5_path']
+    test_deal_5_path = content['']
+    test_deal_30_path = content['']
+    test_line_5_path = content['']
+    test_line_30_path = content['']
 
     test_5 = real_data[0:1800]
     #初始化
     test_30 = import_csv(test_5,'30T')
     test_5_simple = test_5.iloc[0:10, 0:7].copy()
     test_30_simple = test_30.iloc[0:10, 0:7].copy()
+    if not os.path.exists(test_deal_5_path + code):
+        test_5_deal = pd.DataFrame(columns=['date','key','flag','temp'])
+        test_30_deal = pd.DataFrame(columns=['date','key','flag','temp'])
+        test_5_line = pd.DataFrame(columns=['date', 'key', 'flag', 'temp'])
+        test_30_line = pd.DataFrame(columns=['date', 'key', 'flag', 'temp'])
+    else:
+        test_5_deal = pd.read_csv(test_deal_5_path + code)
+        test_30_deal = pd.read_csv(test_deal_30_path + code)
+        test_5_line = pd.read_csv(test_deal_5_path + code)
+        test_30_line = pd.read_csv(test_deal_30_path + code)
 
 
     test_5 = stock_macd(test_5)
@@ -84,3 +103,14 @@ def test(path,code,content):
         test_5 = stock_macd(test_5)
         test_30 = import_csv(test_5, '30T')
         test_30 = stock_macd(test_30)
+        test_5_simple =simpleTrend(test_5,test_5_simple)
+        test_30_simple =simpleTrend(test_30,test_30_simple)
+        test_5_deal = find_point(test_5_simple, test_5_deal)
+        test_30_deal = find_point(test_30_simple, test_30_deal)
+        test_5_line = find_line(test_5_deal , test_5_line)
+        test_30_line = find_line(test_30_deal , test_30_line)
+
+
+
+        strategy_test(test_5,test_5_simple,test_5_deal,test_5_line,test_30,test_30_deal,test_30_line)
+
