@@ -6,7 +6,8 @@ def simpleTrend(df,df_simple):
 
 
     #找第一个新增数据
-
+    df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
+    df_simple['date'] = pd.to_datetime(df_simple['date'], format='%Y-%m-%d')
     tem_data=df[df["date"]>df_simple.iloc[-1]["date"]]
     dfSimple = compare(df_simple,tem_data)
     return dfSimple

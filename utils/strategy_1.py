@@ -1,6 +1,5 @@
 import pandas as pd
 import os
-from utils.regression_tool import stock_macd
 
 
 
@@ -26,16 +25,17 @@ def strategy(path,code):
         if third_result =='get':
             return
 
-def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30,__data_deal_30,__data_line_30):
-    index = __data_simple_5[__data_simple_5["date"] == __data_line_5.iloc[1]["date"]].index.tolist()[0]
-    if index == len(__data_simple_5) -2:
-        first_result = first_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,-1)
+def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30,__data_deal_30,__data_line_30,code):
+    index = __data_simple_5[__data_simple_5["date"] == __data_line_5.iloc[-1]["date"]].index.tolist()[0]
+    if index == len(__data_simple_5) -3:
+        print(code)
+        first_result = first_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,-1,code)
         # if first_result =='get':
         #     return
-        second_result = second_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5)
+        second_result = second_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,code)
         # if second_result =='get':
         #     return
-        third_result = third_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5)
+        third_result = third_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,code)
         #if third_result =='get':
             #return
 
@@ -44,7 +44,7 @@ def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30
 
 
 
-def first_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,__data_line_5,index):
+def first_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,__data_line_5,index,code):
     if __data_line_5.iat[-1,0] ==__data_line_30.iat[-1,0]:
         high, low =__volume_case( __data_line_5)
         #找到密集成交区间
@@ -54,41 +54,56 @@ def first_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__dat
             i =index
             now_5_start_index = __data_5[__data_5["date"] == __data_line_5.iloc[i-1]["date"]].index.tolist()[0]
             now_5_end_index = __data_5[__data_5["date"] == __data_line_5.iloc[i]["date"]].index.tolist()[0]
-            now_5_macd = __data_5.iloc[now_5_start_index:now_5_end_index + 1]["macd"].sum()
-            now_5_dif = __data_5.iloc[now_5_start_index:now_5_end_index + 1]["dif"].max()
+            df = __data_5.iloc[now_5_start_index:now_5_end_index + 1]
+            now_5_macd = df[df['macd'] < 0]['macd'].sum()
+            df = __data_5.iloc[now_5_start_index:now_5_end_index + 1]
+            now_5_diff = df[df['diff'] < 0]["diff"].max()
             last_5_start_index = __data_5[__data_5["date"] == __data_line_5.iloc[i-5]["date"]].index.tolist()[0]
             last_5_end_index = __data_5[__data_5["date"] == __data_line_5.iloc[i-4]["date"]].index.tolist()[0]
-            last_5_macd = __data_5.iloc[last_5_start_index:last_5_end_index + 1]["macd"].sum()
-            last_5_dif = __data_5.iloc[last_5_start_index:last_5_end_index + 1]["dif"].max()
+            df = __data_5.iloc[last_5_start_index:last_5_end_index + 1]
+            last_5_macd = df[df['macd'] < 0]["macd"].sum()
+            df = __data_5.iloc[last_5_start_index:last_5_end_index + 1]
+            last_5_diff = df[df['diff'] < 0]["diff"].max()
 
             now_30_start_index = __data_30[__data_30["date"] == __data_line_30.iloc[i-1]["date"]].index.tolist()[0]
             now_30_end_index = __data_30[__data_30["date"] == __data_line_30.iloc[i]["date"]].index.tolist()[0]
-            now_30_macd = __data_30.iloc[now_30_start_index:now_30_end_index + 1]["macd"].sum()
-            now_30_dif = __data_30.iloc[now_30_start_index:now_30_end_index + 1]["dif"].max()
+            df = __data_30.iloc[now_30_start_index:now_30_end_index + 1]
+            now_30_macd = df[df['macd'] < 0]["macd"].sum()
+            df = __data_30.iloc[now_30_start_index:now_30_end_index + 1]
+            now_30_diff = df[df['diff'] < 0]["diff"].max()
             last_30_start_index = __data_30[__data_30["date"] == __data_line_30.iloc[i-5]["date"]].index.tolist()[0]
             last_30_end_index = __data_30[__data_30["date"] == __data_line_30.iloc[i-4]["date"]].index.tolist()[0]
-            last_30_macd = __data_30.iloc[last_30_start_index:last_30_end_index + 1]["macd"].sum()
-            last_30_dif = __data_30.iloc[last_30_start_index:last_30_end_index + 1]["dif"].max()
+            df = __data_30.iloc[last_30_start_index:last_30_end_index + 1]
+            last_30_macd = df[df['macd'] < 0]["macd"].sum()
+            df = __data_30.iloc[last_30_start_index:last_30_end_index + 1]
+            last_30_diff = df[df['diff'] < 0]["diff"].max()
 
             now_1_end_index =  __data_deal_5[__data_deal_5["date"] ==__data_line_5.iloc[i]["date"]].index.tolist()[0]
             now_1_start_index =  __data_5[__data_5["date"] ==__data_deal_5.iloc[now_1_end_index-1]["date"]].index.tolist()[0]
-            now_1_macd = __data_5.iloc[now_1_start_index:now_5_end_index+1]["macd"].sum()
+            now_1_macd = __data_5.iloc[now_1_start_index:now_5_end_index+1][__data_5['macd'] < 0]["macd"].sum()
+
+
+
+
             last_1_start_index = __data_5[__data_5["date"] ==__data_deal_5.iloc[now_1_end_index-3]["date"]].index.tolist()[0]
             last_1_end_index = __data_5[__data_5["date"] ==__data_deal_5.iloc[now_1_end_index-2]["date"]].index.tolist()[0]
-            last_1_macd = __data_5.iloc[last_1_start_index:last_1_end_index + 1]["macd"].sum()
+            last_1_macd = __data_5.iloc[last_1_start_index:last_1_end_index + 1][__data_5['macd'] < 0]["macd"].sum()
 
-            if __data_line_5.iloc["flag"] =="down":
+
+
+            if __data_line_5.iloc[-1]["flag"] =="down":
                 flag += __deal(now_5_macd,last_5_macd)
+                flag += __deal(now_5_diff, last_5_diff)
                 flag += __deal(now_30_macd, last_30_macd)
-                flag += __deal(now_30_dif, last_30_dif)
+                flag += __deal(now_30_diff, last_30_diff)
                 flag += __deal(now_1_macd, last_1_macd)
                 if flag>2:
-                    print('first buy :'+code+' '+__data_line_5.iloc[-1]["date"])
+                    print('first buy :'+code+' '+str(__data_line_5.iloc[-1]["date"]))
                     #return 'get'
 
-def second_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,__data_line_5):
+def second_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,__data_line_5,code):
     if __data_line_5.iat[-1,0] ==__data_line_30.iat[-1,0] and __data_line_5.iat[-1,0] > __data_line_5.iat[-3,0]:
-        first_result = first_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5, -3)
+        first_result = first_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5, -3,code)
         if first_result == 'get':
             now_1_end_index = __data_deal_5[__data_deal_5["date"] == __data_line_5.iloc[-1]["date"]].index.tolist()[0]
             now_5_end_index = __data_5[__data_5["date"] == __data_line_5.iloc[-1]["date"]].index.tolist()[0]
@@ -98,10 +113,10 @@ def second_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__da
             last_1_end_index = __data_5[__data_5["date"] == __data_deal_5.iloc[now_1_end_index - 2]["date"]].index.tolist()[0]
             last_1_macd = __data_5.iloc[last_1_start_index:last_1_end_index + 1]["macd"].sum()
             if __deal(now_1_macd, last_1_macd) ==1:
-                print('second buy :' + code + ' ' + __data_line_5.iloc[-1]["date"])
+                print('second buy :' + code + ' ' + str(__data_line_5.iloc[-1]["date"]))
                 #return 'get'
 
-def third_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5):
+def third_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,code):
     if __data_line_5.iat[-1, 0] == __data_line_30.iat[-1, 0]:
         high, low = __volume_case(__data_line_5)
         # 找到密集成交区间
@@ -112,20 +127,20 @@ def third_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, _
             now_5_start_index = __data_5[__data_5["date"] == __data_line_5.iloc[i - 1]["date"]].index.tolist()[0]
             now_5_end_index = __data_5[__data_5["date"] == __data_line_5.iloc[i]["date"]].index.tolist()[0]
             now_5_macd = __data_5.iloc[now_5_start_index:now_5_end_index + 1]["macd"].sum()
-            now_5_dif = __data_5.iloc[now_5_start_index:now_5_end_index + 1]["dif"].max()
+            now_5_diff = __data_5.iloc[now_5_start_index:now_5_end_index + 1]["diff"].max()
             last_5_start_index = __data_5[__data_5["date"] == __data_line_5.iloc[i - 5]["date"]].index.tolist()[0]
             last_5_end_index = __data_5[__data_5["date"] == __data_line_5.iloc[i - 4]["date"]].index.tolist()[0]
             last_5_macd = __data_5.iloc[last_5_start_index:last_5_end_index + 1]["macd"].sum()
-            last_5_dif = __data_5.iloc[last_5_start_index:last_5_end_index + 1]["dif"].max()
+            last_5_diff = __data_5.iloc[last_5_start_index:last_5_end_index + 1]["diff"].max()
 
             # now_30_start_index = __data_30[__data_30["date"] == __data_line_30.iloc[i - 1]["date"]].index.tolist()[0]
             # now_30_end_index = __data_30[__data_30["date"] == __data_line_30.iloc[i]["date"]].index.tolist()[0]
             # now_30_macd = __data_30.iloc[now_30_start_index:now_30_end_index + 1]["macd"].sum()
-            # now_30_dif = __data_30.iloc[now_30_start_index:now_30_end_index + 1]["dif"].max()
+            # now_30_diff = __data_30.iloc[now_30_start_index:now_30_end_index + 1]["diff"].max()
             # last_30_start_index = __data_30[__data_30["date"] == __data_line_30.iloc[i - 5]["date"]].index.tolist()[0]
             # last_30_end_index = __data_30[__data_30["date"] == __data_line_30.iloc[i - 4]["date"]].index.tolist()[0]
             # last_30_macd = __data_30.iloc[last_30_start_index:last_30_end_index + 1]["macd"].sum()
-            # last_30_dif = __data_30.iloc[last_30_start_index:last_30_end_index + 1]["dif"].max()
+            # last_30_diff = __data_30.iloc[last_30_start_index:last_30_end_index + 1]["diff"].max()
 
             now_1_end_index = __data_deal_5[__data_deal_5["date"] == __data_line_5.iloc[i]["date"]].index.tolist()[0]
             now_1_start_index = \
@@ -137,13 +152,13 @@ def third_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, _
             __data_5[__data_5["date"] == __data_deal_5.iloc[now_1_end_index - 2]["date"]].index.tolist()[0]
             last_1_macd = __data_5.iloc[last_1_start_index:last_1_end_index + 1]["macd"].sum()
 
-            if __data_line_5.iloc["flag"] == "down":
+            if __data_line_5.iloc[-1]["flag"] == "down":
                 flag += __deal(now_5_macd, last_5_macd)
                 # flag += __deal(now_30_macd, last_30_macd)
-                # flag += __deal(now_30_dif, last_30_dif)
+                # flag += __deal(now_30_diff, last_30_diff)
                 flag += __deal(now_1_macd, last_1_macd)
                 if flag > 0:
-                    print('third buy :' + code + ' ' + __data_line_5.iloc[-1]["date"])
+                    print('third buy :' + code + ' ' + str(__data_line_5.iloc[-1]["date"]))
                     #return 'get'
 
 
@@ -180,6 +195,8 @@ def __assess(high,low):
 def __deal(gt,lt):
     if gt>lt:
         return 1
+    else:
+        return 0
 
 
 if __name__ == '__main__':

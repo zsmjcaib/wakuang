@@ -1,6 +1,6 @@
 import pandas as pd
 import talib
-import yaml
+from chart import chart_test
 from utils.point import simpleTrend
 from utils.deal import find_point
 from utils.line import find_line
@@ -35,6 +35,7 @@ def csv_resample(df, rule) -> pd.DataFrame:
 # 读取csv文件，返回pd.DataFrame对象
 def import_csv(df,rule) -> pd.DataFrame:
 
+    df =df.copy()
     df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
     df = df.set_index(['date'])
     df = csv_resample(df, rule)
@@ -73,12 +74,17 @@ def stock_macd(df) -> pd.DataFrame:
 def test(path,code,content):
     real_data = pd.read_csv(path + code)
     test_normal_5_path = content['test_normal_5_path']
-    test_deal_5_path = content['']
-    test_deal_30_path = content['']
-    test_line_5_path = content['']
-    test_line_30_path = content['']
+    test_normal_30_path = content['test_normal_30_path']
+    test_simple_5_path = content['test_simple_5_path']
+    test_simple_30_path = content['test_simple_30_path']
+    test_deal_5_path = content['test_deal_5_path']
+    test_deal_30_path = content['test_deal_30_path']
+    test_line_5_path = content['test_line_5_path']
+    test_line_30_path = content['test_line_30_path']
+    test_chart_5_path = content['test_chart_5_path']
+    test_chart_30_path = content['test_chart_30_path']
 
-    test_5 = real_data[0:1800]
+    test_5 = real_data[0:13884]
     #初始化
     test_30 = import_csv(test_5,'30T')
     test_5_simple = test_5.iloc[0:10, 0:7].copy()
@@ -98,19 +104,36 @@ def test(path,code,content):
     test_5 = stock_macd(test_5)
     test_30 = stock_macd(test_30)
     #开始回测
-    for _, row in real_data[1800:].iterrows():
+    for i, row in real_data[13884:].iterrows():
         test_5 = test_5.append(row)
         test_5 = stock_macd(test_5)
         test_30 = import_csv(test_5, '30T')
         test_30 = stock_macd(test_30)
         test_5_simple =simpleTrend(test_5,test_5_simple)
         test_30_simple =simpleTrend(test_30,test_30_simple)
+        test_5_simple.reset_index(drop=True, inplace=True)
+        test_30_simple.reset_index(drop=True, inplace=True)
         test_5_deal = find_point(test_5_simple, test_5_deal)
         test_30_deal = find_point(test_30_simple, test_30_deal)
         test_5_line = find_line(test_5_deal , test_5_line)
         test_30_line = find_line(test_30_deal , test_30_line)
 
+        if i == 13884:
+            print(1)
+        strategy_test(test_5,test_5_simple,test_5_deal,test_5_line,test_30,test_30_deal,test_30_line,code[:6])
+        if i%2000 ==0:
+            test_5.to_csv(test_normal_5_path+code[:6]+'_'+str(i) +'.csv')
+            test_30.to_csv(test_normal_30_path+code[:6]+'_'+str(i) +'.csv')
+            test_5_simple.to_csv(test_simple_5_path+code[:6]+'_'+str(i) +'.csv')
+            test_30_simple.to_csv(test_simple_30_path+code[:6]+'_'+str(i) +'.csv')
+            test_5_deal.to_csv(test_deal_5_path+code[:6]+'_'+str(i) +'.csv')
+            test_30_deal.to_csv(test_deal_30_path+code[:6]+'_'+str(i) +'.csv')
+            test_5_line.to_csv(test_deal_5_path+code[:6]+'_'+str(i) +'.csv')
+            test_30_line.to_csv(test_deal_30_path+code[:6]+'_'+str(i) +'.csv')
+            grid_5_chart = chart_test(test_5_simple,test_5_deal,test_5_line)
+            grid_5_chart.render(test_chart_5_path+code[:6]+'_'+str(i) + ".html")
+            grid_30_chart = chart_test(test_30_simple, test_30_deal, test_30_line)
+            grid_30_chart.render(test_chart_30_path + code[:6] + '_' + str(i) + ".html")
 
 
-        strategy_test(test_5,test_5_simple,test_5_deal,test_5_line,test_30,test_30_deal,test_30_line)
 

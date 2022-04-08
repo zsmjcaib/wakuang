@@ -7,19 +7,20 @@ def find_line(df, df_line):
     if (len(df) < 3):
         return
 
-    df = __find(df, df_line)
-    return df
+    __find(df, df_line)
+    return df_line
 
 
 def __find(df, df_line):
     if (len(df) < 5): return
+    df_line.drop(df_line[df_line["temp"] == "temp"].index.tolist(), inplace=True)
+    df_line.drop(df_line[df_line["temp"] == "yes"].index.tolist(), inplace=True)
     # 初始化
     if (len(df_line) == 0):
         index = -1
         __deal(index, df, df_line)
 
     else:
-        df_line.drop(df_line[df_line["temp"] == "temp"].index.tolist(), inplace=True)
         index = df[df["date"] == df_line.iat[-1, 0]].index.tolist()[0]
         __deal(index, df, df_line)
     __last(df, df_line)
@@ -29,7 +30,6 @@ def __deal(index, df, df_line):
     if (len(df_line) == 0):
         i = index
     else:
-        df_line.drop(df_line[df_line["temp"] == "temp"].index.tolist(), inplace=True)
         i = df[df["date"] == df_line.iat[-1, 0]].index.tolist()[0]
     while i < len(df) - 5:
         # try:
@@ -38,7 +38,6 @@ def __deal(index, df, df_line):
         #     # if i ==135:
         #         print(df_line.iloc[-1]["date"])
         # except: pass
-        df_line.drop(df_line[df_line["temp"] == "temp"].index.tolist(), inplace=True)
         # 初始化
         try:
 

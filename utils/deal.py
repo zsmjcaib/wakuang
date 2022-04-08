@@ -24,10 +24,10 @@ def  find(df, df_point):
     if (len(df_point) < 2):
         for index in range(3,len(df)-1):
 
-            a=df.iloc[index]["date"]
-            print(a)
-            if(df.iloc[index]["date"] == '2022-3-3 09:35'):
-                print("1")
+            # a=df.iloc[index]["date"]
+            # print(a)
+            # if(df.iloc[index]["date"] == '2022-3-3 09:35'):
+            #     print("1")
 
             flag,mark,key =__deal(index, df, df_point)
             if(flag != "no"):
@@ -96,8 +96,8 @@ def __deal_temp( df, df_line):
             new = pd.DataFrame({"date": df["date"].iloc[key_index], "key": key, "flag": "min", "temp": "temp"},index=[1])
             df_line = df_line.append(new, ignore_index=True)
             #寻找是否还有高点
-            if(key_index<len(df)):
-                key = df["high"].iloc[index:].max()
+            if(key_index<len(df)-1):
+                key = df["high"].iloc[key_index:].max()
                 key_index = df[df["high"] == key].index.tolist()[-1]
                 new = pd.DataFrame({"date": df["date"].iloc[key_index], "key":key, "flag": "max", "temp": "temp"},index=[1])
                 df_line = df_line.append(new, ignore_index=True)
@@ -108,7 +108,7 @@ def __deal_temp( df, df_line):
             new = pd.DataFrame({"date": df["date"].iloc[key_index], "key": key, "flag": "max", "temp": "temp"},index=[1])
             df_line = df_line.append(new, ignore_index=True)
             # 寻找是否还有低点
-            if (key_index < len(df)):
+            if (key_index < len(df)-1):
                 key = df["low"].iloc[key_index:].min()
                 key_index = df[df["low"] == key].index.tolist()[-1]
                 new = pd.DataFrame(

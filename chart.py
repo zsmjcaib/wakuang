@@ -20,8 +20,8 @@ from pyecharts.charts import Kline,Line,Bar,Grid,Scatter
 
 
 
-def draw_kline(file,target_path,simple_file='',line_file=''):
-    df = pd.read_csv(file)
+def draw_kline(df,deal,line):
+
 
     # -----时间处理------------------
     date = df['date'].tolist()
@@ -78,13 +78,13 @@ def draw_kline(file,target_path,simple_file='',line_file=''):
                 ),
                 opts.DataZoomOpts(is_show=True, xaxis_index=[0, 1], range_end=100)
             ],
-            title_opts=opts.TitleOpts(title=file.split('\\')[-1].split('.')[0] + '/' + file.split('\\')[-2] +'min'),
+            # title_opts=opts.TitleOpts(title=file.split('\\')[-1].split('.')[0] + '/' + file.split('\\')[-2] +'min'),
         )
     )
-    if(simple_file != ''):
-        simple = pd.read_csv(simple_file)
-        simple_date = simple['date'].tolist()
-        close = np.array(simple["key"]).tolist()
+    if(len(deal) != 0):
+
+        simple_date = deal['date'].tolist()
+        close = np.array(deal["key"]).tolist()
         ma_line = (
             Line()
                 .add_xaxis(xaxis_data=simple_date)
@@ -121,8 +121,8 @@ def draw_kline(file,target_path,simple_file='',line_file=''):
         overlap_k_line = kline.overlap(ma_line)
     else:
         overlap_k_line = kline
-    if line_file !='':
-        line = pd.read_csv(line_file)
+    if len(line) !=0:
+        # line = pd.read_csv(line)
         line_date = line['date'].tolist()
         close = np.array(line["key"]).tolist()
         __line = (
@@ -201,7 +201,16 @@ def draw_kline(file,target_path,simple_file='',line_file=''):
             pos_left="5%", pos_right="1%", pos_top="70%", height="20%"
         )
     )
-    grid_chart.render(target_path + file.split('\\')[-1].split('.')[0] + ".html")
+    # grid_chart.render(target_path + file.split('\\')[-1].split('.')[0] + ".html")
+    return grid_chart
+
+def chart_test(df,deal,line):
+    grid_chart = draw_kline(df,deal,line)
+    return grid_chart
+
+
+
+
 
 if __name__ == '__main__':
     # target = ['5','30', 'day']
@@ -210,12 +219,12 @@ if __name__ == '__main__':
     for i in target:
 
         # path = 'D:\project\data\stock\\normal\\'+i+'\\'
-        path = 'D:\project\data\stock\simple\\'+i+'\\'
-        simple_path = 'D:\project\data\stock\\deal\\'+i+'\\'
+        simple_path = 'D:\project\data\stock\simple\\'+i+'\\'
+        deal_path = 'D:\project\data\stock\\deal\\'+i+'\\'
         target_path = 'D:\project\data\stock\chart\\'+i+'\\'
         line_path = 'D:\project\data\stock\line\\'+i+'\\'
         for file_code in os.listdir(line_path):
-            draw_kline(path + file_code, target_path, simple_path + file_code,line_path+file_code)
+            draw_kline(simple_path + file_code, target_path, deal_path + file_code,line_path+file_code)
 
 
     # file_code = '002627.csv'
