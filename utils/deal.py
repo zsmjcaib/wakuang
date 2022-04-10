@@ -22,7 +22,7 @@ def  find(df, df_point):
     if(len(df) < 4):return
     #初始化
     if (len(df_point) < 2):
-        for index in range(3,len(df)-1):
+        for index in range(3,len(df)):
 
             # a=df.iloc[index]["date"]
             # print(a)
@@ -38,7 +38,7 @@ def  find(df, df_point):
     else:
         df_point.drop(df_point[df_point["temp"] == "temp"].index.tolist(), inplace=True)
         i = df[df["date"] == df_point["date"][df_point["temp"] == "yes"].tolist()[0]].index.tolist()[0]
-        for index in range(i,len(df)-1):
+        for index in range(i,len(df)):
             flag, mark, key = __deal(index, df, df_point)
             if (flag != "no"):
                 new = pd.DataFrame({"date": df.iat[index-1, 0], "key": key, "flag": flag, "temp": "yes"},index=[1])
@@ -57,27 +57,38 @@ def __deal(index, df, df_point):
     a = df.iloc[index-1]["date"]
     #判断顶点
     if(df.iloc[index-1]["high"]>=df.iloc[index]["high"] and df.iloc[index-1]["high"]>=df.iloc[index-2]["high"]):
-        if(flag is  None):
-            return "max", index - 1, df.iloc[index - 1]["high"]
         if(flag == "min" and df[df["date"] == df_point.iat[-1, 0]].index.tolist()[0]+3<index):
             df_point.iat[-1, 3] = "no"
             return "max", index - 1, df.iloc[index - 1]["high"]
         #更新顶点
-        elif(flag == "max" and key<=df.iloc[index-1]["high"]):
+        if(flag == "max" and key<=df.iloc[index-1]["high"]):
             df_point.drop(df_point.tail(1).index, inplace=True)
+            return "max", index - 1, df.iloc[index - 1]["high"]
+        # 更新高点
+        if flag == "min" and df_point.iat[-1, 3] == "yes" and df.iloc[index]["low"]<=df_point.iat[-1, 1] and \
+                len(df_point)>2 and df_point.iat[-2, 1]<df.iloc[index-1]["high"]:
+            df_point.drop(df_point.tail(2).index, inplace=True)
+            return "max", index - 1, df.iloc[index - 1]["high"]
+        if(flag is  None):
             return "max", index - 1, df.iloc[index - 1]["high"]
         else:
             return "no", -1, -1
 
     elif(df.iloc[index-1]["low"]<=df.iloc[index]["low"] and df.iloc[index-1]["low"]<=df.iloc[index-2]["low"]):
-        if (flag is None):
-            return "min", index - 1, df.iloc[index - 1]["low"]
+
         if(flag == "max" and  df[df["date"] == df_point.iat[-1, 0]].index.tolist()[0]+3<index):
             df_point.iat[-1, 3] = "no"
             return "min", index - 1, df.iloc[index - 1]["low"]
         #更新低点
-        elif(flag == "min" and key>=df.iloc[index-1]["low"]) :
+        if(flag == "min" and key>=df.iloc[index-1]["low"]) :
             df_point.drop(df_point.tail(1).index, inplace=True)
+            return "min", index - 1, df.iloc[index - 1]["low"]
+        # 更新低点
+        if flag == "max" and df_point.iat[-1, 3] == "yes" and df.iloc[index]["high"]>=df_point.iat[-1, 1]\
+                and len(df_point)>2 and df_point.iat[-2, 1]>df.iloc[index-1]["low"]:
+            df_point.drop(df_point.tail(2).index, inplace=True)
+            return "min", index - 1, df.iloc[index - 1]["low"]
+        if (flag is None):
             return "min", index - 1, df.iloc[index - 1]["low"]
         else: return "no", -1, -1
     else:

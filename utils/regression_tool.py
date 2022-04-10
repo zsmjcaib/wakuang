@@ -84,7 +84,7 @@ def test(path,code,content):
     test_chart_5_path = content['test_chart_5_path']
     test_chart_30_path = content['test_chart_30_path']
 
-    test_5 = real_data[0:13884]
+    test_5 = real_data[0:5000]
     #初始化
     test_30 = import_csv(test_5,'30T')
     test_5_simple = test_5.iloc[0:10, 0:7].copy()
@@ -104,7 +104,7 @@ def test(path,code,content):
     test_5 = stock_macd(test_5)
     test_30 = stock_macd(test_30)
     #开始回测
-    for i, row in real_data[13884:].iterrows():
+    for i, row in real_data[5000:].iterrows():
         test_5 = test_5.append(row)
         test_5 = stock_macd(test_5)
         test_30 = import_csv(test_5, '30T')
@@ -117,19 +117,21 @@ def test(path,code,content):
         test_30_deal = find_point(test_30_simple, test_30_deal)
         test_5_line = find_line(test_5_deal , test_5_line)
         test_30_line = find_line(test_30_deal , test_30_line)
-
-        if i == 13884:
+        if str(test_5.iloc[-1]["date"]) == '2021-07-14 11:15:00':
             print(1)
-        strategy_test(test_5,test_5_simple,test_5_deal,test_5_line,test_30,test_30_deal,test_30_line,code[:6])
+        #     2022-02-17 13:20:00
+        # if i ==7803:
+        #     print(i)
+        strategy_test(test_5,test_5_simple,test_5_deal,test_5_line,test_30,test_30_deal,test_30_line,code[:6],test_chart_5_path,i,test_chart_30_path,test_30_simple)
         if i%2000 ==0:
-            test_5.to_csv(test_normal_5_path+code[:6]+'_'+str(i) +'.csv')
-            test_30.to_csv(test_normal_30_path+code[:6]+'_'+str(i) +'.csv')
-            test_5_simple.to_csv(test_simple_5_path+code[:6]+'_'+str(i) +'.csv')
-            test_30_simple.to_csv(test_simple_30_path+code[:6]+'_'+str(i) +'.csv')
-            test_5_deal.to_csv(test_deal_5_path+code[:6]+'_'+str(i) +'.csv')
-            test_30_deal.to_csv(test_deal_30_path+code[:6]+'_'+str(i) +'.csv')
-            test_5_line.to_csv(test_deal_5_path+code[:6]+'_'+str(i) +'.csv')
-            test_30_line.to_csv(test_deal_30_path+code[:6]+'_'+str(i) +'.csv')
+            # test_5.to_csv(test_normal_5_path+code[:6]+'_'+str(i) +'.csv')
+            # test_30.to_csv(test_normal_30_path+code[:6]+'_'+str(i) +'.csv')
+            # test_5_simple.to_csv(test_simple_5_path+code[:6]+'_'+str(i) +'.csv')
+            # test_30_simple.to_csv(test_simple_30_path+code[:6]+'_'+str(i) +'.csv')
+            # test_5_deal.to_csv(test_deal_5_path+code[:6]+'_'+str(i) +'.csv')
+            # test_30_deal.to_csv(test_deal_30_path+code[:6]+'_'+str(i) +'.csv')
+            # test_5_line.to_csv(test_line_5_path+code[:6]+'_'+str(i) +'.csv')
+            # test_30_line.to_csv(test_line_30_path+code[:6]+'_'+str(i) +'.csv')
             grid_5_chart = chart_test(test_5_simple,test_5_deal,test_5_line)
             grid_5_chart.render(test_chart_5_path+code[:6]+'_'+str(i) + ".html")
             grid_30_chart = chart_test(test_30_simple, test_30_deal, test_30_line)
