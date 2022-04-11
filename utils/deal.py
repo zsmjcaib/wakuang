@@ -36,8 +36,8 @@ def  find(df, df_point):
                 df_point = df_point.append(new, ignore_index=True)
     #一般情况
     else:
-        df_point.drop(df_point[df_point["temp"] == "temp"].index.tolist(), inplace=True)
-        i = df[df["date"] == df_point["date"][df_point["temp"] == "yes"].tolist()[0]].index.tolist()[0]
+        df_point.drop(df_point[df_point["temp"] == "yes"].index.tolist(), inplace=True)
+        i = df[df["date"] == df_point["date"][df_point["temp"] == "no"].tolist()[-1]].index.tolist()[-1]
         for index in range(i,len(df)):
             flag, mark, key = __deal(index, df, df_point)
             if (flag != "no"):
@@ -94,41 +94,66 @@ def __deal(index, df, df_point):
     else:
         return "no", -1, -1
 
-def __deal_temp( df, df_line):
+def __deal_temp(df, df_point):
     try:
         #最后一个临时关键点
-        index = df[df["date"] == df_line["date"][df_line["temp"] == "yes"].tolist()[0]].index.tolist()[0]
-        i = df_line[df_line["temp"] == "yes"].index.tolist()[-1]
-        flag = df_line["flag"].iloc[i]
+        index = df[df["date"] == df_point["date"][df_point["temp"] == "yes"].tolist()[0]].index.tolist()[0]
+        i = df_point[df_point["temp"] == "yes"].index.tolist()[-1]
+        flag = df_point["flag"].iloc[i]
         if(flag == "max"):
-            #后面的最低点
-            key = df["low"].iloc[index:].min()
-            key_index = df[df["low"] == key].index.tolist()[-1]
-            new = pd.DataFrame({"date": df["date"].iloc[key_index], "key": key, "flag": "min", "temp": "temp"},index=[1])
-            df_line = df_line.append(new, ignore_index=True)
-            #寻找是否还有高点
-            if(key_index<len(df)-1):
-                key = df["high"].iloc[key_index:].max()
+            # #后面的最低点
+            # key = df["low"].iloc[index:].min()
+            # key_index = df[df["low"] == key].index.tolist()[-1]
+            # new = pd.DataFrame({"date": df["date"].iloc[key_index], "key": key, "flag": "min", "temp": "temp"},index=[1])
+            # df_line = df_line.append(new, ignore_index=True)
+            # #寻找是否还有高点
+            # if(key_index<len(df)-1):
+            #     key = df["high"].iloc[key_index:].max()
+            # 寻找是否还有高点
+            if (index < len(df) - 1):
+                key = df["high"].iloc[index:].max()
                 key_index = df[df["high"] == key].index.tolist()[-1]
-                new = pd.DataFrame({"date": df["date"].iloc[key_index], "key":key, "flag": "max", "temp": "temp"},index=[1])
-                df_line = df_line.append(new, ignore_index=True)
+                if key>=df_point.iat[-1,1]:
+                    df_point.drop(df_point.tail(1).index, inplace=True)
+                    new = pd.DataFrame({"date": df["date"].iloc[key_index], "key":key, "flag": "max", "temp": "yes"},index=[1])
+                    df_point = df_point.append(new, ignore_index=True)
+                    # 后面的最低点
+                    if(key_index<len(df)-1):
+                        key  = df["low"].iloc[key_index:].min()
+                        key_index = df[df["low"] == key].index.tolist()[-1]
+                        new = pd.DataFrame(
+                            {"date": df["date"].iloc[key_index], "key": key, "flag": "min", "temp": "yes"}, index=[1])
+                        df_point = df_point.append(new, ignore_index=True)
+
+
         else:
-            # 后面的最高点
-            key = df["high"].iloc[index:].max()
-            key_index = df[df["high"] == key].index.tolist()[-1]
-            new = pd.DataFrame({"date": df["date"].iloc[key_index], "key": key, "flag": "max", "temp": "temp"},index=[1])
-            df_line = df_line.append(new, ignore_index=True)
+            # # 后面的最高点
+            # key = df["high"].iloc[index:].max()
+            # key_index = df[df["high"] == key].index.tolist()[-1]
+            # new = pd.DataFrame({"date": df["date"].iloc[key_index], "key": key, "flag": "max", "temp": "temp"},index=[1])
+            # df_line = df_line.append(new, ignore_index=True)
+            # # 寻找是否还有低点
+            # if (key_index < len(df)-1):
+            #     key = df["low"].iloc[key_index:].min()
             # 寻找是否还有低点
-            if (key_index < len(df)-1):
-                key = df["low"].iloc[key_index:].min()
+            if (index < len(df) - 1):
+                key = df["low"].iloc[index:].min()
                 key_index = df[df["low"] == key].index.tolist()[-1]
-                new = pd.DataFrame(
-                    {"date": df["date"].iloc[key_index], "key": key, "flag": "min", "temp": "temp"},index=[1])
-                df_line = df_line.append(new, ignore_index=True)
-                return df_line
-        return df_line
+                if key<=df_point.iat[-1,1]:
+                    df_point.drop(df_point.tail(1).index, inplace=True)
+                    new = pd.DataFrame(
+                        {"date": df["date"].iloc[key_index], "key": key, "flag": "min", "temp": "yes"},index=[1])
+                    df_point = df_point.append(new, ignore_index=True)
+                    # 后面的最高点
+                    if (key_index < len(df) - 1):
+                        key = df["high"].iloc[key_index:].max()
+                        key_index = df[df["high"] == key].index.tolist()[-1]
+                        new = pd.DataFrame(
+                            {"date": df["date"].iloc[key_index], "key": key, "flag": "max", "temp": "yes"}, index=[1])
+                        df_point = df_point.append(new, ignore_index=True)
+        return df_point
     except:
-        print("worng:"+str(target_path + file_code))
+        print("worng:"+str(df.iat[-1,0]))
 
 if __name__ == '__main__':
 

@@ -5,6 +5,7 @@ from utils.point import simpleTrend
 from utils.deal import find_point
 from utils.line import find_line
 from utils.strategy_1 import strategy_test
+from utils.small_to_large import check
 import os
 
 
@@ -84,7 +85,7 @@ def test(path,code,content):
     test_chart_5_path = content['test_chart_5_path']
     test_chart_30_path = content['test_chart_30_path']
 
-    test_5 = real_data[0:5000]
+    test_5 = real_data[0:7750]
     #初始化
     test_30 = import_csv(test_5,'30T')
     test_5_simple = test_5.iloc[0:10, 0:7].copy()
@@ -92,8 +93,8 @@ def test(path,code,content):
     if not os.path.exists(test_deal_5_path + code):
         test_5_deal = pd.DataFrame(columns=['date','key','flag','temp'])
         test_30_deal = pd.DataFrame(columns=['date','key','flag','temp'])
-        test_5_line = pd.DataFrame(columns=['date', 'key', 'flag', 'temp'])
-        test_30_line = pd.DataFrame(columns=['date', 'key', 'flag', 'temp'])
+        test_5_line = pd.DataFrame(columns=['date', 'key', 'flag', 'temp','small_to_large'])
+        test_30_line = pd.DataFrame(columns=['date', 'key', 'flag', 'temp','small_to_large'])
     else:
         test_5_deal = pd.read_csv(test_deal_5_path + code)
         test_30_deal = pd.read_csv(test_deal_30_path + code)
@@ -104,7 +105,7 @@ def test(path,code,content):
     test_5 = stock_macd(test_5)
     test_30 = stock_macd(test_30)
     #开始回测
-    for i, row in real_data[5000:].iterrows():
+    for i, row in real_data[7750:].iterrows():
         test_5 = test_5.append(row)
         test_5 = stock_macd(test_5)
         test_30 = import_csv(test_5, '30T')
@@ -117,12 +118,19 @@ def test(path,code,content):
         test_30_deal = find_point(test_30_simple, test_30_deal)
         test_5_line = find_line(test_5_deal , test_5_line)
         test_30_line = find_line(test_30_deal , test_30_line)
-        if str(test_5.iloc[-1]["date"]) == '2021-07-14 11:15:00':
+        if str(test_5.iloc[-1]["date"]) == '2021-08-31 14:00:00':
             print(1)
         #     2022-02-17 13:20:00
-        # if i ==7803:
-        #     print(i)
+        # if i ==7998:
+        print(i)
         strategy_test(test_5,test_5_simple,test_5_deal,test_5_line,test_30,test_30_deal,test_30_line,code[:6],test_chart_5_path,i,test_chart_30_path,test_30_simple)
+        if test_5_line.iloc[-1]["small_to_large"] =='yes' or test_5_line.iloc[-2]["small_to_large"] =='yes':
+            result ,date = check(test_5_deal,test_5_line)
+            if result == 'yes':
+                print('small to buy :' + code + ' '+str(i) + ' '+date+' now date'+ str(test_5.iat[-1,0]))
+            # elif result == 'no':
+            #     print('small to buy fail :' + code + ' '+str(i) + ' '+ str(test_5_line.iloc[-1]["date"]))
+
         if i%2000 ==0:
             # test_5.to_csv(test_normal_5_path+code[:6]+'_'+str(i) +'.csv')
             # test_30.to_csv(test_normal_30_path+code[:6]+'_'+str(i) +'.csv')

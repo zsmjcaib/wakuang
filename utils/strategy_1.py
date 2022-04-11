@@ -32,17 +32,17 @@ def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30
         #最后不能太无力
         if (__data_simple_5.iloc[-3]["close"]<=__data_simple_5.iloc[-1]["close"] or __data_simple_5.iloc[-1]["close"]>=__data_simple_5.iloc[-3]["open"])\
                 and  (__data_simple_5.iloc[-1]["high"]>__data_simple_5.iloc[-2]["high"] or __data_simple_5.iloc[-1]["close"]>__data_simple_5.iloc[-3]["high"]):
-            first_result = first_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,-1,code,i)
+            first_result = first_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,__data_simple_5,-1,code,i)
             if first_result =='get':
                 grid_5_chart = chart_test(__data_simple_5, __data_deal_5, __data_line_5)
-                grid_5_chart.render(test_chart_5_path + code[:6] + '_' + str(code) + '_'+str(i)+"first.html")
+                grid_5_chart.render(test_chart_5_path + code[:6]  + '_'+str(i)+"first.html")
                 grid_30_chart = chart_test(__data_simple_30, __data_deal_30, __data_line_30)
-                grid_30_chart.render(test_chart_30_path + code[:6] + '_' + str(code) + '_' + str(i) + "first.html")
+                grid_30_chart.render(test_chart_30_path + code[:6] + '_' + str(i) + "first.html")
             if first_result == 'no':
                 grid_5_chart = chart_test(__data_simple_5, __data_deal_5, __data_line_5)
-                grid_5_chart.render(test_chart_5_path + code[:6] + '_' + str(code) + '_' + str(i) + "failfirst.html")
+                grid_5_chart.render(test_chart_5_path + code[:6]  + '_' + str(i) + "failfirst.html")
                 grid_30_chart = chart_test(__data_simple_30, __data_deal_30, __data_line_30)
-                grid_30_chart.render(test_chart_30_path + code[:6] + '_' + str(code) + '_' + str(i) + "failfirst.html")
+                grid_30_chart.render(test_chart_30_path + code[:6] + '_' + str(i) + "failfirst.html")
         #     return
         # second_result = second_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,code)
         # if second_result =='get':
@@ -57,9 +57,8 @@ def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30
 
 
 
-def first_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,__data_line_5,index,code,flag1):
-    # if __data_line_5.iat[-1,0]+datetime.timedelta(minutes=-30)<=__data_line_30.iat[-1,0]<__data_line_5.iat[-1,0]+datetime.timedelta(minutes=30):
-    if 1:
+def first_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,__data_line_5,__data_simple_5,index,code,flag1):
+    if __data_simple_5.iat[-4,0]+datetime.timedelta(minutes=-30)<=__data_line_30.iat[-1,0]<__data_line_5.iat[-2,0]+datetime.timedelta(minutes=30):
         zhigh_5, zlow_5,high_5,low_5 =__volume_case( __data_line_5)
         # zhigh_30, zlow_30, high_30, low_30 = __volume_case(__data_line_30)
         #找到密集成交区间
@@ -151,6 +150,7 @@ def first_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__dat
                     if now_1_macd_vaule>0 or now_1_macd_vaule>now_5_macd_min*0.3:
                         flag += 1
                         str_6 = '1分钟macd严重背离 '
+                        __data_line_5.iat[-1,4] = 'yes'
                     if now_5_macd_min*1.1>last_5_macd_min:
                         flag += 1
                         str_7 = '5分钟macd值 '
