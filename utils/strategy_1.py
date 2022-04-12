@@ -58,7 +58,7 @@ def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30
 
 
 def first_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,__data_line_5,__data_simple_5,index,code,flag1):
-    if __data_simple_5.iat[-4,0]+datetime.timedelta(minutes=-30)<=__data_line_30.iat[-1,0]<__data_line_5.iat[-2,0]+datetime.timedelta(minutes=30):
+    if __data_simple_5.iat[-4,0]+datetime.timedelta(minutes=-30)<=__data_line_30.iat[-1,0]<__data_simple_5.iat[-2,0]+datetime.timedelta(minutes=30):
         zhigh_5, zlow_5,high_5,low_5 =__volume_case( __data_line_5)
         # zhigh_30, zlow_30, high_30, low_30 = __volume_case(__data_line_30)
         #找到密集成交区间

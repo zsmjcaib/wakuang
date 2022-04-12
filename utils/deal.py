@@ -41,7 +41,8 @@ def  find(df, df_point,max_list,min_list,ignore_list):
     #一般情况
     else:
         df_point.drop(df_point[df_point["temp"] == "yes"].index.tolist(), inplace=True)
-        i = df[df["date"] == df_point["date"][df_point["temp"] == "no"].tolist()[-1]].index.tolist()[-1]
+        #最新位置的索引
+        i = df[df["date"] == df_point["date"][df_point["temp"] == "no"].tolist()[-1]].index.tolist()[-1]+2
         for index in range(i,len(df)):
             if index in ignore_list:
                 continue
@@ -145,13 +146,14 @@ def __deal(index, df, df_point,max_list,min_list,ignore_list):
         return "no", -1, -1
     else:
         return "no", -1, -1
-
 def __deal_temp(df, df_point,max_list,min_list):
     try:
         #最后一个临时关键点
-        index = df[df["date"] == df_point["date"][df_point["temp"] == "yes"].tolist()[0]].index.tolist()[0]
-        i = df_point[df_point["temp"] == "yes"].index.tolist()[-1]
-        flag = df_point["flag"].iloc[i]
+        # index = df[df["date"] == df_point["date"][df_point["temp"] == "yes"].tolist()[0]].index.tolist()[0]+1
+        index = df[df["date"] == df_point.iat[-1,0]].index.tolist()[0]+1
+        # i = df_point[df_point["temp"] == "yes"].index.tolist()[-1]
+        # flag = df_point["flag"].iloc[i]
+        flag = df_point.iat[-1,2]
         if(flag == "max"):
             # #后面的最低点
             # key = df["low"].iloc[index:].min()
@@ -173,6 +175,7 @@ def __deal_temp(df, df_point,max_list,min_list):
                         df_point.iat[-1, 1] = df.iat[min_index, 3]
                     new = pd.DataFrame({"date": df["date"].iloc[key_index], "key":key, "flag": "max", "temp": "yes"},index=[1])
                     df_point = df_point.append(new, ignore_index=True)
+                    key_index += 1
                     # 后面的最低点
                     if(key_index<len(df)-1):
                         key  = df["low"].iloc[key_index:].min()
@@ -180,7 +183,13 @@ def __deal_temp(df, df_point,max_list,min_list):
                         new = pd.DataFrame(
                             {"date": df["date"].iloc[key_index], "key": key, "flag": "min", "temp": "yes"}, index=[1])
                         df_point = df_point.append(new, ignore_index=True)
-
+                else:
+                    key = df["low"].iloc[index:].min()
+                    key_index = df[df["low"] == key].index.tolist()[-1]
+                    if key < df_point.iat[-1, 1]:
+                        new = pd.DataFrame(
+                            {"date": df["date"].iloc[key_index], "key": key, "flag": "max", "temp": "yes"}, index=[1])
+                        df_point = df_point.append(new, ignore_index=True)
 
         else:
             # # 后面的最高点
@@ -204,6 +213,7 @@ def __deal_temp(df, df_point,max_list,min_list):
                     new = pd.DataFrame(
                         {"date": df["date"].iloc[key_index], "key": key, "flag": "min", "temp": "yes"},index=[1])
                     df_point = df_point.append(new, ignore_index=True)
+                    key_index += 1
                     # 后面的最高点
                     if (key_index < len(df) - 1):
                         key = df["high"].iloc[key_index:].max()
@@ -211,9 +221,18 @@ def __deal_temp(df, df_point,max_list,min_list):
                         new = pd.DataFrame(
                             {"date": df["date"].iloc[key_index], "key": key, "flag": "max", "temp": "yes"}, index=[1])
                         df_point = df_point.append(new, ignore_index=True)
+                #再找高点
+                else:
+                    key = df["high"].iloc[index:].max()
+                    key_index = df[df["high"] == key].index.tolist()[-1]
+                    if key>df_point.iat[-1,1]:
+                        new = pd.DataFrame(
+                            {"date": df["date"].iloc[key_index], "key": key, "flag": "max", "temp": "yes"}, index=[1])
+                        df_point = df_point.append(new, ignore_index=True)
         return df_point
     except:
         print("worng:"+str(df.iat[-1,0]))
+        return df_point
 
 if __name__ == '__main__':
 
