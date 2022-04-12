@@ -119,7 +119,7 @@ def test(path,code,content):
         test_5_line = find_line(test_5_deal , test_5_line)
         test_30_line = find_line(test_30_deal , test_30_line)
         #2021-08-02 09:45:00
-        if str(test_5.iloc[-1]["date"]) == '2021-08-02 09:45:00':
+        if str(test_5.iloc[-1]["date"]) == '2021-08-31 11:20:00':
             print(1)
             # grid_5_chart = chart_test(test_5_simple, test_5_deal, test_5_line)
             # grid_5_chart.render(test_chart_5_path + code[:6] + '_' + str(i) + ".html")
