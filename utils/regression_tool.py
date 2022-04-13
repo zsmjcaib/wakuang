@@ -93,8 +93,8 @@ def test(path,code,content):
     if not os.path.exists(test_deal_5_path + code):
         test_5_deal = pd.DataFrame(columns=['date','key','flag','temp'])
         test_30_deal = pd.DataFrame(columns=['date','key','flag','temp'])
-        test_5_line = pd.DataFrame(columns=['date', 'key', 'flag', 'temp','small_to_large'])
-        test_30_line = pd.DataFrame(columns=['date', 'key', 'flag', 'temp','small_to_large'])
+        test_5_line = pd.DataFrame(columns=['date', 'key', 'flag', 'temp','small_to_large','first'])
+        test_30_line = pd.DataFrame(columns=['date', 'key', 'flag', 'temp','small_to_large','first'])
     else:
         test_5_deal = pd.read_csv(test_deal_5_path + code)
         test_30_deal = pd.read_csv(test_deal_30_path + code)
@@ -119,7 +119,7 @@ def test(path,code,content):
         test_5_line = find_line(test_5_deal , test_5_line)
         test_30_line = find_line(test_30_deal , test_30_line)
         #2021-08-02 09:45:00
-        if str(test_5.iloc[-1]["date"]) == '2021-08-31 11:20:00':
+        if str(test_5.iloc[-1]["date"]) == '2021-07-30 09:55:00':
             print(1)
             # grid_5_chart = chart_test(test_5_simple, test_5_deal, test_5_line)
             # grid_5_chart.render(test_chart_5_path + code[:6] + '_' + str(i) + ".html")
@@ -149,6 +149,10 @@ def test(path,code,content):
             grid_5_chart.render(test_chart_5_path+code[:6]+'_'+str(i) + ".html")
             grid_30_chart = chart_test(test_30_simple, test_30_deal, test_30_line)
             grid_30_chart.render(test_chart_30_path + code[:6] + '_' + str(i) + ".html")
+    grid_5_chart = chart_test(test_5_simple, test_5_deal, test_5_line)
+    grid_5_chart.render(test_chart_5_path + code[:6] + '_' + 'last' + ".html")
+    grid_30_chart = chart_test(test_30_simple, test_30_deal, test_30_line)
+    grid_30_chart.render(test_chart_30_path + code[:6] + '_' + 'last' + ".html")
 
 
 
