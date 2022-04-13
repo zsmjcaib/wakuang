@@ -32,7 +32,8 @@ def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30
     if index == len(__data_simple_5) -3:
         #最后不能太无力
         if (__data_simple_5.iloc[-3]["close"]<=__data_simple_5.iloc[-1]["close"] or __data_simple_5.iloc[-1]["close"]>=__data_simple_5.iloc[-3]["open"])\
-                and  (__data_simple_5.iloc[-1]["high"]>__data_simple_5.iloc[-2]["high"] or __data_simple_5.iloc[-1]["close"]>__data_simple_5.iloc[-3]["high"])\
+                and  (__data_simple_5.iloc[-1]["high"]>__data_simple_5.iloc[-2]["high"] or __data_simple_5.iloc[-1]["close"]>__data_simple_5.iloc[-3]["high"]
+                or __data_simple_5.iloc[-1]["close"]>(__data_simple_5.iloc[-3]["high"]+__data_simple_5.iloc[-3]["close"])/2)\
             and __data_simple_5.iat[-4,0]+datetime.timedelta(minutes=-30)<=__data_line_30.iat[-1,0]<__data_simple_5.iat[-1,0]+datetime.timedelta(minutes=30):
             first_result = first_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,__data_simple_5,-1,code,i)
             # if first_result =='get':
@@ -46,17 +47,21 @@ def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30
             #     grid_30_chart = chart_test(__data_simple_30, __data_deal_30, __data_line_30)
             #     grid_30_chart.render(test_chart_30_path + code[:6] + '_' + str(i) + "failfirst.html")
         #     return
-        second_result = second_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,__data_simple_5,code,i)
-        if second_result =='get':
-            grid_5_chart = chart_test(__data_simple_5, __data_deal_5, __data_line_5)
-            grid_5_chart.render(test_chart_5_path + code[:6] + '_' + str(i) + "second.html")
-            grid_30_chart = chart_test(__data_simple_30, __data_deal_30, __data_line_30)
-            grid_30_chart.render(test_chart_30_path + code[:6] + '_' + str(i) + "second.html")
-        if second_result == 'no':
-            grid_5_chart = chart_test(__data_simple_5, __data_deal_5, __data_line_5)
-            grid_5_chart.render(test_chart_5_path + code[:6] + '_' + str(i) + "failsecond.html")
-            grid_30_chart = chart_test(__data_simple_30, __data_deal_30, __data_line_30)
-            grid_30_chart.render(test_chart_30_path + code[:6] + '_' + str(i) + "failsecond.html")
+        elif __data_line_5.iat[-1,1]>__data_line_5.iat[-3,1] and __data_line_5.iloc[-1]["flag"] =="down"\
+            and (__data_line_5.iat[-3,4] =='second' or __data_line_5.iat[-3,5] =='yes'):
+            __data_line_5.iat[-1, 6] = 'yes'
+            print(" here: "  +str(__data_line_5.iat[-1, 0]))
+            # second_result = second_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,__data_simple_5,code,i)
+            # if second_result =='get':
+            #     grid_5_chart = chart_test(__data_simple_5, __data_deal_5, __data_line_5)
+            #     grid_5_chart.render(test_chart_5_path + code[:6] + '_' + str(i) + "second.html")
+            #     grid_30_chart = chart_test(__data_simple_30, __data_deal_30, __data_line_30)
+            #     grid_30_chart.render(test_chart_30_path + code[:6] + '_' + str(i) + "second.html")
+            # if second_result == 'no':
+            #     grid_5_chart = chart_test(__data_simple_5, __data_deal_5, __data_line_5)
+            #     grid_5_chart.render(test_chart_5_path + code[:6] + '_' + str(i) + "failsecond.html")
+            #     grid_30_chart = chart_test(__data_simple_30, __data_deal_30, __data_line_30)
+            #     grid_30_chart.render(test_chart_30_path + code[:6] + '_' + str(i) + "failsecond.html")
         # third_result = third_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,code)
         #if third_result =='get':
             #return
@@ -168,7 +173,7 @@ def first_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__dat
                         flag += 1
                         str_8 = '30分钟macd值 '
                     if flag>4 and (__deal(now_30_macd, last_30_macd)==1 or __deal(now_30_diff, last_30_diff)==1):
-                        # print('first buy :'+code+' '+str(__data_line_5.iloc[-1]["date"]) + ' '+str(flag1)+ ' '+str_1+str_2+str_3+str_4+str_5+str_6+str_7+str_8)
+                        print('first buy :'+code+' '+str(__data_line_5.iloc[-1]["date"]) + ' '+str(flag1)+ ' '+str_1+str_2+str_3+str_4+str_5+str_6+str_7+str_8)
                         __data_line_5.iat[-1,5]='yes'
                         return 'get'
                     else:
@@ -288,24 +293,22 @@ def second_first(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,
 def second_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,__data_line_5,__data_simple_5,code,i):
     # first_result = second_first(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,__data_simple_5, -3,code,i)
     # if first_result == 'get':
-    if __data_line_5.iat[-2,5] =='yes':
-        now_1_end_index = __data_deal_5[__data_deal_5["date"] == __data_line_5.iloc[-1]["date"]].index.tolist()[0]
-        now_5_end_index = __data_5[__data_5["date"] == __data_line_5.iloc[-1]["date"]].index.tolist()[0]
-        now_1_start_index = __data_5[__data_5["date"] == __data_deal_5.iloc[now_1_end_index - 1]["date"]].index.tolist()[0]
-        now_1_macd = __data_5.iloc[now_1_start_index:now_1_end_index + 1]["macd"].sum()
+    now_1_end_index = __data_deal_5[__data_deal_5["date"] == __data_line_5.iloc[-1]["date"]].index.tolist()[0]
+    now_5_end_index = __data_5[__data_5["date"] == __data_line_5.iloc[-1]["date"]].index.tolist()[0]
+    now_1_start_index = __data_5[__data_5["date"] == __data_deal_5.iloc[now_1_end_index - 1]["date"]].index.tolist()[0]
+    now_1_macd = __data_5.iloc[now_1_start_index:now_1_end_index + 1]["macd"].sum()
 
-        last_1_start_index = __data_deal_5[__data_deal_5["date"] == __data_line_5.iloc[-1]["date"]].index.tolist()[0]
-        last_1 = __data_deal_5[last_1_start_index:now_1_end_index - 1].reset_index()
-        last_1_macd = find_last_1_macd(last_1, __data_5, "down")
+    last_1_start_index = __data_deal_5[__data_deal_5["date"] == __data_line_5.iloc[-1]["date"]].index.tolist()[0]
+    last_1 = __data_deal_5[last_1_start_index:now_1_end_index - 1].reset_index()
+    last_1_macd = find_last_1_macd(last_1, __data_5, "down")
 
-        if __deal(now_1_macd, last_1_macd) ==1:
-            print('second buy :' + code + ' ' + str(__data_line_5.iloc[-1]["date"])+' now '+str(__data_5.iloc[-1]["date"]))
-            return 'get'
-        else:
-            print('不行 second buy :' + code + ' ' + str(__data_line_5.iloc[-1]["date"])+' now '+str(__data_5.iloc[-1]["date"]))
-            return 'no'
+    if __deal(now_1_macd, last_1_macd) ==1:
+        print('second buy :' + code + ' ' + str(__data_line_5.iloc[-1]["date"])+' now '+str(__data_5.iloc[-1]["date"]))
+        return 'get'
     else:
+        print('不行 second buy :' + code + ' ' + str(__data_line_5.iloc[-1]["date"])+' now '+str(__data_5.iloc[-1]["date"]))
         return 'no'
+
 
 def third_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,code):
     if __data_line_5.iat[-1, 0] == __data_line_30.iat[-1, 0]:

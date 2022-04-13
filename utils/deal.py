@@ -171,8 +171,9 @@ def __deal_temp(df, df_point,max_list,min_list):
                     df_point.drop(df_point.tail(1).index, inplace=True)
                     if min_list != []:
                         min_index = min_list.pop(-1)
-                        df_point.iat[-1, 0] = df.iat[min_index, 0]
-                        df_point.iat[-1, 1] = df.iat[min_index, 3]
+                        if min_index+2<key_index:
+                            df_point.iat[-1, 0] = df.iat[min_index, 0]
+                            df_point.iat[-1, 1] = df.iat[min_index, 3]
                     new = pd.DataFrame({"date": df["date"].iloc[key_index], "key":key, "flag": "max", "temp": "yes"},index=[1])
                     df_point = df_point.append(new, ignore_index=True)
                     key_index += 1
@@ -208,8 +209,9 @@ def __deal_temp(df, df_point,max_list,min_list):
                     df_point.drop(df_point.tail(1).index, inplace=True)
                     if max_list != []:
                         max_index = max_list.pop(-1)
-                        df_point.iat[-1, 0] = df.iat[max_index, 0]
-                        df_point.iat[-1, 1] = df.iat[max_index, 2]
+                        if max_index+2<key_index:
+                            df_point.iat[-1, 0] = df.iat[max_index, 0]
+                            df_point.iat[-1, 1] = df.iat[max_index, 2]
                     new = pd.DataFrame(
                         {"date": df["date"].iloc[key_index], "key": key, "flag": "min", "temp": "yes"},index=[1])
                     df_point = df_point.append(new, ignore_index=True)
