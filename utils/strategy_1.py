@@ -18,13 +18,13 @@ def strategy(path,code):
     index = __data_simple_5[__data_simple_5["date"] == __data_line_5.iloc[1]["date"]].index.tolist()[0]
     if index == len(__data_simple_5) -2:
         first_result = first_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,-1)
-        if first_result =='get':
+        if first_result =='yes':
             return
         second_result = second_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5)
-        if second_result =='get':
+        if second_result =='yes':
             return
         third_result = third_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5)
-        if third_result =='get':
+        if third_result =='yes':
             return
 
 def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30,__data_deal_30,__data_line_30,code,test_chart_5_path,i,test_chart_30_path,__data_simple_30):
@@ -36,7 +36,8 @@ def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30
                 or __data_simple_5.iloc[-1]["close"]>(__data_simple_5.iloc[-3]["high"]+__data_simple_5.iloc[-3]["close"])/2)\
             and __data_simple_5.iat[-4,0]+datetime.timedelta(minutes=-30)<=__data_line_30.iat[-1,0]<__data_simple_5.iat[-1,0]+datetime.timedelta(minutes=30):
             first_result = first_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,__data_simple_5,-1,code,i)
-            # if first_result =='get':
+            return first_result
+            # if first_result =='yes':
             #     grid_5_chart = chart_test(__data_simple_5, __data_deal_5, __data_line_5)
             #     grid_5_chart.render(test_chart_5_path + code[:6]  + '_'+str(i)+"first.html")
             #     grid_30_chart = chart_test(__data_simple_30, __data_deal_30, __data_line_30)
@@ -52,7 +53,7 @@ def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30
             __data_line_5.iat[-1, 6] = 'yes'
             print(" here: "  +str(__data_line_5.iat[-1, 0]))
             # second_result = second_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,__data_simple_5,code,i)
-            # if second_result =='get':
+            # if second_result =='yes':
             #     grid_5_chart = chart_test(__data_simple_5, __data_deal_5, __data_line_5)
             #     grid_5_chart.render(test_chart_5_path + code[:6] + '_' + str(i) + "second.html")
             #     grid_30_chart = chart_test(__data_simple_30, __data_deal_30, __data_line_30)
@@ -63,7 +64,7 @@ def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30
             #     grid_30_chart = chart_test(__data_simple_30, __data_deal_30, __data_line_30)
             #     grid_30_chart.render(test_chart_30_path + code[:6] + '_' + str(i) + "failsecond.html")
         # third_result = third_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,code)
-        #if third_result =='get':
+        #if third_result =='yes':
             #return
 
 
@@ -175,7 +176,7 @@ def first_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__dat
                     if flag>4 and (__deal(now_30_macd, last_30_macd)==1 or __deal(now_30_diff, last_30_diff)==1):
                         print('first buy :'+code+' '+str(__data_line_5.iloc[-1]["date"]) + ' '+str(flag1)+ ' '+str_1+str_2+str_3+str_4+str_5+str_6+str_7+str_8)
                         __data_line_5.iat[-1,5]='yes'
-                        return 'get'
+                        return 'yes'
                     else:
                         # print('不行' + code + ' ' + str(__data_line_5.iloc[-1]["date"])+ ' '+str(flag1)+ ' '+str_1+str_2+str_3+str_4+str_5+str_6+str_7+str_8)
                         return 'no'
@@ -284,7 +285,7 @@ def second_first(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,
                         flag += 1
                         str_8 = '30分钟macd值 '
                     if flag>4 and (__deal(now_30_macd, last_30_macd)==1 or __deal(now_30_diff, last_30_diff)==1):
-                        return 'get'
+                        return 'yes'
                     else:
                         return 'no'
             else:
@@ -292,7 +293,7 @@ def second_first(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,
 
 def second_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,__data_line_5,__data_simple_5,code,i):
     # first_result = second_first(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,__data_simple_5, -3,code,i)
-    # if first_result == 'get':
+    # if first_result == 'yes':
     now_1_end_index = __data_deal_5[__data_deal_5["date"] == __data_line_5.iloc[-1]["date"]].index.tolist()[0]
     now_5_end_index = __data_5[__data_5["date"] == __data_line_5.iloc[-1]["date"]].index.tolist()[0]
     now_1_start_index = __data_5[__data_5["date"] == __data_deal_5.iloc[now_1_end_index - 1]["date"]].index.tolist()[0]
@@ -304,7 +305,7 @@ def second_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__da
 
     if __deal(now_1_macd, last_1_macd) ==1:
         print('second buy :' + code + ' ' + str(__data_line_5.iloc[-1]["date"])+' now '+str(__data_5.iloc[-1]["date"]))
-        return 'get'
+        return 'yes'
     else:
         print('不行 second buy :' + code + ' ' + str(__data_line_5.iloc[-1]["date"])+' now '+str(__data_5.iloc[-1]["date"]))
         return 'no'
@@ -353,9 +354,123 @@ def third_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, _
                 flag += __deal(now_1_macd, last_1_macd)
                 if flag > 0:
                     print('third buy :' + code + ' ' + str(__data_line_5.iloc[-1]["date"]))
-                    #return 'get'
+                    #return 'yes'
 
 
+def first_selling_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,__data_line_5,__data_simple_5,index,code,flag1):
+    zhigh_5, zlow_5, high_5, low_5 = __volume_case(__data_line_5, index + 1)
+    # zhigh_30, zlow_30, high_30, low_30 = __volume_case(__data_line_30)
+    # 找到密集成交区间
+    i = index  # -1
+    # 30分钟起点
+    last_30_start_index = measure(__data_line_30, i)
+    last_5_start_index = measure(__data_line_5, i)
+    # 确定下降
+    if __data_line_5.iloc[i]["key"] < low_5 and last_5_start_index != -1 \
+            and __data_line_5.iloc[i]["flag"] == "rise" and last_30_start_index != -1:
+        flag = 0
+        # 比较最后一段与密集成交前一段力度
+        now_5_end_index = __data_5[__data_5["date"] == __data_line_5.iloc[i]["date"]].index.tolist()[0]
+        # 判断现在力度是否在减小
+        if __data_5.iloc[now_5_end_index]['macd'] <= __data_5.iloc[now_5_end_index + 1]['macd'] <= \
+                __data_5.iloc[now_5_end_index + 2]['macd'] \
+                or __data_5.iloc[now_5_end_index]['macd'] > 0:
+            now_5_start_index = __data_5[__data_5["date"] == __data_line_5.iloc[i - 1]["date"]].index.tolist()[0]
+            df = __data_5.iloc[now_5_start_index:now_5_end_index + 1]
+            now_5_macd = df[df['macd'] < 0]['macd'].sum() * 1.2
+            now_5_macd_max = df['macd'].max()
+            df = __data_5.iloc[now_5_start_index:now_5_end_index + 1]
+            now_5_diff = df[df['diff'] < 0]["diff"].max() * 1.2
+            last_5_end_index = \
+            __data_5[__data_5["date"] == __data_line_5.iloc[last_5_start_index + 1]["date"]].index.tolist()[0]
+            last_5_start_index = \
+            __data_5[__data_5["date"] == __data_line_5.iloc[last_5_start_index]["date"]].index.tolist()[0]
+            df = __data_5.iloc[last_5_start_index:last_5_end_index + 1]
+            last_5_macd = df[df['macd'] < 0]["macd"].sum()
+            last_5_macd_max = df['macd'].max()
+            df = __data_5.iloc[last_5_start_index:last_5_end_index + 1]
+            last_5_diff = df[df['diff'] < 0]["diff"].max()
+
+            now_30_start_index = __data_30[__data_30["date"] == __data_line_30.iloc[i - 1]["date"]].index.tolist()[0]
+            now_30_end_index = __data_30[__data_30["date"] == __data_line_30.iloc[i]["date"]].index.tolist()[0]
+            df = __data_30.iloc[now_30_start_index:now_30_end_index + 1]
+            now_30_macd = df[df['macd'] < 0]["macd"].sum() * 1.2
+            now_30_macd_max = df['macd'].max()
+            df = __data_30.iloc[now_30_start_index:now_30_end_index + 1]
+            now_30_diff = df[df['diff'] < 0]["diff"].max() * 1.2
+            # last_30_start_index = __data_30[__data_30["date"] == __data_line_30.iloc[i-5]["date"]].index.tolist()[0]
+            # last_30_end_index = __data_30[__data_30["date"] == __data_line_30.iloc[i-4]["date"]].index.tolist()[0]
+            last_30_end_index = \
+            __data_30[__data_30["date"] == __data_line_30.iloc[last_30_start_index + 1]["date"]].index.tolist()[0]
+            last_30_start_index = \
+            __data_30[__data_30["date"] == __data_line_30.iloc[last_30_start_index]["date"]].index.tolist()[0]
+            df = __data_30.iloc[last_30_start_index:last_30_end_index + 1]
+            last_30_macd = df[df['macd'] < 0]["macd"].sum()
+            last_30_macd_max = df['macd'].max()
+            df = __data_30.iloc[last_30_start_index:last_30_end_index + 1]
+            last_30_diff = df[df['diff'] < 0]["diff"].max()
+
+            now_1_end_index = __data_deal_5[__data_deal_5["date"] == __data_line_5.iloc[i]["date"]].index.tolist()[0]
+            now_1_start_index = \
+            __data_5[__data_5["date"] == __data_deal_5.iloc[now_1_end_index - 1]["date"]].index.tolist()[0]
+            df = __data_5.iloc[now_1_start_index:now_5_end_index + 1]
+            now_1_macd = df[df['macd'] < 0]['macd'].sum() * 1.2
+            now_1_macd_vaule = __data_5.iloc[now_5_end_index + 1]['macd']
+            last_1_start_index = \
+            __data_deal_5[__data_deal_5["date"] == __data_line_5.iloc[i - 1]["date"]].index.tolist()[0]
+            last_1_end_index = now_1_end_index
+            last_1 = __data_deal_5[last_1_start_index:last_1_end_index - 1].reset_index()
+            last_1_macd = find_last_1_macd(last_1, __data_5, "rise")
+
+
+
+            if __data_line_5.iloc[-1]["flag"] =="down":
+                str_1 ='5分钟macd不行 '
+                str_2 ='5分钟diff不行 '
+                str_3 ='30分钟macd不行 '
+                str_4 ='30分钟diff不行 '
+                str_5 ='1分钟macd不行 '
+                str_6 = '1分钟macd不背离 '
+                str_7 = '5分钟macd值不行 '
+                str_8 = '30分钟macd值不行 '
+                str_9 = '1分钟macd不背离 '
+
+                if __deal(now_5_macd, last_5_macd) == 1:
+                    str_1 = '5分钟macd '
+                    flag += 1
+                if __deal(now_5_diff, last_5_diff) == 1:
+                    str_2 = '5分钟diff '
+                    flag += 1
+                if __deal(now_30_macd, last_30_macd) == 1:
+                    str_3 = '30分钟macd '
+                    flag += 1
+                if __deal(now_30_diff, last_30_diff) == 1:
+                    str_4 = '30分钟diff '
+                    flag += 1
+                if __deal(now_1_macd, last_1_macd) == 1:
+                    str_5 = '1分钟macd '
+                    flag += 1
+                if now_1_macd_vaule > 0 or now_1_macd_vaule > now_5_macd_max * 0.3:
+                    flag += 1
+                    str_6 = '1分钟macd严重背离 '
+                    __data_line_5.iat[-1, 4] = 'yes'
+                if now_5_macd_max * 1.1 > last_5_macd_max:
+                    flag += 1
+                    str_7 = '5分钟macd值 '
+                if now_30_macd_max * 1.1 > last_30_macd_max:
+                    flag += 1
+                    str_8 = '30分钟macd值 '
+                if flag > 4 and (__deal(now_30_macd, last_30_macd) == 1 or __deal(now_30_diff, last_30_diff) == 1):
+                    print('first buy :' + code + ' ' + str(__data_line_5.iloc[-1]["date"]) + ' ' + str(
+                        flag1) + ' ' + str_1 + str_2 + str_3 + str_4 + str_5 + str_6 + str_7 + str_8)
+                    __data_line_5.iat[-1, 5] = 'yes'
+                    return 'yes'
+                else:
+                    # print('不行' + code + ' ' + str(__data_line_5.iloc[-1]["date"])+ ' '+str(flag1)+ ' '+str_1+str_2+str_3+str_4+str_5+str_6+str_7+str_8)
+                    return 'no'
+        else:
+            # print('力度没有减小'+code+' '+str(__data_line_5.iloc[-1]["date"]) )
+            return 'no'
 
 
 

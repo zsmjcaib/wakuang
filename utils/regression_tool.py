@@ -5,7 +5,8 @@ from utils.point import simpleTrend
 from utils.deal import find_point
 from utils.line import find_line
 from utils.strategy_1 import strategy_test
-from utils.small_to_large import check, check_second
+from utils.small_to_large import check, check_second,check_sell
+from utils.util import read_record
 import os
 
 
@@ -84,8 +85,8 @@ def test(path,code,content):
     test_line_30_path = content['test_line_30_path']
     test_chart_5_path = content['test_chart_5_path']
     test_chart_30_path = content['test_chart_30_path']
-
-    test_5 = real_data[0:6300]
+    demo_path = content['demo_path']
+    test_5 = real_data[0:5000]
     #初始化
     test_30 = import_csv(test_5,'30T')
     test_5_simple = test_5.iloc[0:10, 0:7].copy()
@@ -100,13 +101,15 @@ def test(path,code,content):
         test_30_deal = pd.read_csv(test_deal_30_path + code)
         test_5_line = pd.read_csv(test_deal_5_path + code)
         test_30_line = pd.read_csv(test_deal_30_path + code)
-
+    demo_first = read_record(demo_path,code,'first')
+    demo_second = read_record(demo_path,code,'second')
+    demo_small = read_record(demo_path,code,'small')
 
     test_5 = stock_macd(test_5)
     test_30 = stock_macd(test_30)
     #开始回测
-    for i, row in real_data[6300:].iterrows():
-        if str(test_5.iloc[-1]["date"]) == '2021-08-02 10:45:00':
+    for i, row in real_data[5000:].iterrows():
+        if str(test_5.iloc[-1]["date"]) == '2021-09-03 09:50:00':
             print(1)
         test_5 = test_5.append(row)
         test_5 = stock_macd(test_5)
@@ -127,12 +130,15 @@ def test(path,code,content):
         #     2022-02-17 13:20:00
         if i ==5000:
             print(i)
-
+        # print(i)
         # print(str(i)+' '+str(test_5_line.iat[-1,0])+' '+str(test_5_line.iat[-2,0])+' '+str(test_5_line.iat[-3,0]))
-        strategy_test(test_5,test_5_simple,test_5_deal,test_5_line,test_30,test_30_deal,test_30_line,code[:6],test_chart_5_path,i,test_chart_30_path,test_30_simple)
+        result = strategy_test(test_5,test_5_simple,test_5_deal,test_5_line,test_30,test_30_deal,test_30_line,code[:6],test_chart_5_path,i,test_chart_30_path,test_30_simple)
+        if  result == 'yes':
+            demo_first.loc[len(demo_first)] = [test_5.iat[- 1, 0], test_5.iat[- 1, 2], "", test_5.iat[- 2, 2], ""]
         if test_5_line.iloc[-1]["small_to_large"] =='yes' or test_5_line.iloc[-2]["small_to_large"] =='yes':
             result ,date = check(test_5_deal,test_5_line)
             if result == 'yes':
+                demo_small.loc[len(demo_small)] = [test_5.iat[- 1, 0],  test_5.iat[- 1, 2], "", test_5.iat[- 2, 2], ""]
                 print('small to buy :' + code + ' '+str(i) + ' '+date+' now date'+ str(test_5.iat[-1,0]))
             # elif result == 'no':
             #     print('small to buy fail :' + code + ' '+str(i) + ' '+ str(test_5_line.iloc[-1]["date"]))
@@ -140,11 +146,15 @@ def test(path,code,content):
         if test_5_line.iat[-1,6] == 'yes' or test_5_line.iat[-2,6] == 'yes':
             result, date = check_second(test_5_deal, test_5_line)
             if result == 'yes':
-                print('second to buy :' + code + ' ' + str(i) + ' ' + date + ' now date' + str(test_5.iat[-1, 0]))
-            elif result == 'no':
-                print('second to buy fail :' + code + ' '+str(i) + ' '+ str(test_5_line.iloc[-1]["date"])+ ' now date' + str(test_5.iat[-1, 0]))
+                demo_second.loc[len(demo_second)] = [test_5.iat[- 1, 0], test_5.iat[- 1, 2], "", test_5.iat[- 2, 6], ""]
 
+                print('second to buy :' + code + ' ' + str(i) + ' ' + date + ' now date ' + str(test_5.iat[-1, 0]))
+            # elif result == 'no':
+                # print('second to buy fail :' + code + ' '+str(i) + ' '+ str(test_5_line.iloc[-1]["date"])+ ' now date ' + str(test_5.iat[-1, 0]))
 
+        #止损
+        if len(demo_first)>1 and demo_first.iat[-1,4]=='':
+            check_sell(demo_first,test_5)
 
 
         if i%1000 ==0:
@@ -164,6 +174,9 @@ def test(path,code,content):
     grid_5_chart.render(test_chart_5_path + code[:6] + '_' + 'last' + ".html")
     grid_30_chart = chart_test(test_30_simple, test_30_deal, test_30_line)
     grid_30_chart.render(test_chart_30_path + code[:6] + '_' + 'last' + ".html")
+    demo_first.to_csv(demo_path+code[:6] +'_first.csv')
+    demo_small.to_csv(demo_path + code[:6] + '_small.csv')
+    demo_second.to_csv(demo_path + code[:6] + '_second.csv')
 
 
 
