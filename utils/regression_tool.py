@@ -4,9 +4,10 @@ from chart import chart_test
 from utils.point import simpleTrend
 from utils.deal import find_point
 from utils.line import find_line
-from utils.strategy_1 import strategy_test
+from utils.strategy_buy import strategy_test
 from utils.small_to_large import check, check_second,check_sell
 from utils.util import read_record
+from utils.strategy_sell import strategy_sell
 import os
 
 
@@ -86,7 +87,7 @@ def test(path,code,content):
     test_chart_5_path = content['test_chart_5_path']
     test_chart_30_path = content['test_chart_30_path']
     demo_path = content['demo_path']
-    test_5 = real_data[0:5000]
+    test_5 = real_data[0:13000]
     #初始化
     test_30 = import_csv(test_5,'30T')
     test_5_simple = test_5.iloc[0:10, 0:7].copy()
@@ -108,9 +109,8 @@ def test(path,code,content):
     test_5 = stock_macd(test_5)
     test_30 = stock_macd(test_30)
     #开始回测
-    for i, row in real_data[5000:].iterrows():
-        if str(test_5.iloc[-1]["date"]) == '2021-09-03 09:50:00':
-            print(1)
+    for i, row in real_data[13000:].iterrows():
+
         test_5 = test_5.append(row)
         test_5 = stock_macd(test_5)
         test_30 = import_csv(test_5, '30T')
@@ -123,7 +123,8 @@ def test(path,code,content):
         test_30_deal = find_point(test_30_simple, test_30_deal)
         test_5_line = find_line(test_5_deal , test_5_line)
         test_30_line = find_line(test_30_deal , test_30_line)
-        #2021-08-02 09:45:00
+        if str(test_5.iloc[-1]["date"]) == '2022-02-22 10:10:00':
+            print(1)
 
             # grid_5_chart = chart_test(test_5_simple, test_5_deal, test_5_line)
             # grid_5_chart.render(test_chart_5_path + code[:6] + '_' + str(i) + ".html")
@@ -146,15 +147,26 @@ def test(path,code,content):
         if test_5_line.iat[-1,6] == 'yes' or test_5_line.iat[-2,6] == 'yes':
             result, date = check_second(test_5_deal, test_5_line)
             if result == 'yes':
-                demo_second.loc[len(demo_second)] = [test_5.iat[- 1, 0], test_5.iat[- 1, 2], "", test_5.iat[- 2, 6], ""]
+                demo_second.loc[len(demo_second)] = [test_5.iat[- 1, 0], test_5.iat[- 1, 2], "", test_5.iat[- 2, 2], ""]
 
                 print('second to buy :' + code + ' ' + str(i) + ' ' + date + ' now date ' + str(test_5.iat[-1, 0]))
             # elif result == 'no':
                 # print('second to buy fail :' + code + ' '+str(i) + ' '+ str(test_5_line.iloc[-1]["date"])+ ' now date ' + str(test_5.iat[-1, 0]))
 
+        result = strategy_sell(test_5,test_5_simple,test_5_deal,test_5_line,test_30,test_30_deal,test_30_line,code[:6],test_chart_5_path,i,test_chart_30_path,test_30_simple)
+
+
+
+
+
+
         #止损
         if len(demo_first)>1 and demo_first.iat[-1,4]=='':
-            check_sell(demo_first,test_5)
+            check_sell(demo_first,test_5,'first')
+        if len(demo_second) > 1 and demo_second.iat[-1, 4] == '':
+            check_sell(demo_second, test_5,'second')
+        if len(demo_small) > 1 and demo_small.iat[-1, 4] == '':
+            check_sell(demo_small, test_5,'small')
 
 
         if i%1000 ==0:

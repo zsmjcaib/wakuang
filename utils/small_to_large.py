@@ -24,9 +24,17 @@ def check_second(df_deal,df_line):
         return 'yes',str(df_line.iloc[-2]["date"])
     return 'no','0'
 
-def check_sell(df,data):
+def check_sell(df,data,flag):
     #更新高点
-    if df.iat[-1,6] < data.iloc[-1]["high"]:
-        df.iat[-1, 6] = data.iloc[-1]["high"]
+    # if df.iloc[-1]['high_price'] ==''or df.iloc[-1]['high_price'] < data.iloc[-1]["high"]:
+    #     df.iloc[-1]['high_price'] = data.iloc[-1]["high"]
+    if df.iat[-1,3] == '' or df.iat[-1,4] < data.iloc[-1]["high"]:
+        df.iat[-1, 3] = data.iloc[-1]["high"]
+    if df.iat[-1,1] ==  data.iat[-1,0]:
+        print('同一天')
+        return
+    # if flag == 'first':
+
+
 
 
