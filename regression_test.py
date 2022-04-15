@@ -17,4 +17,4 @@ if __name__ == '__main__':
         normal_30_path = content['normal_30_path']
         # for code in os.listdir(line_5_path)[0:10]:
         #     test(normal_5_path, code,content)
-        test(normal_5_path, '600976.csv', content)
+        test(normal_5_path, '000933.csv', content)

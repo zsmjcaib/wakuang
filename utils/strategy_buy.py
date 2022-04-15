@@ -35,8 +35,8 @@ def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30
                 and  (__data_simple_5.iloc[-1]["high"]>__data_simple_5.iloc[-2]["high"] or __data_simple_5.iloc[-1]["close"]>__data_simple_5.iloc[-3]["high"]
                 or __data_simple_5.iloc[-1]["close"]>(__data_simple_5.iloc[-3]["high"]+__data_simple_5.iloc[-3]["close"])/2)\
             and __data_simple_5.iat[-4,0]+datetime.timedelta(minutes=-30)<=__data_line_30.iat[-1,0]<__data_simple_5.iat[-1,0]+datetime.timedelta(minutes=30):
-            first_result = first_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,__data_simple_5,-1,code,i)
-            return first_result
+            first_result ,mark_price= first_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,__data_simple_5,-1,code,i)
+            return first_result,mark_price
             # if first_result =='yes':
             #     grid_5_chart = chart_test(__data_simple_5, __data_deal_5, __data_line_5)
             #     grid_5_chart.render(test_chart_5_path + code[:6]  + '_'+str(i)+"first.html")
@@ -48,10 +48,12 @@ def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30
             #     grid_30_chart = chart_test(__data_simple_30, __data_deal_30, __data_line_30)
             #     grid_30_chart.render(test_chart_30_path + code[:6] + '_' + str(i) + "failfirst.html")
         #     return
-        elif __data_line_5.iat[-1,1]>__data_line_5.iat[-3,1] and __data_line_5.iloc[-1]["flag"] =="down"\
-            and (__data_line_5.iat[-3,4] =='second' or __data_line_5.iat[-3,5] =='yes'):
-            __data_line_5.iat[-1, 6] = 'yes'
-            print(" here: "  +str(__data_line_5.iat[-1, 0]))
+        elif __data_line_5.iat[-1,1]>__data_line_5.iat[-3,1] and __data_line_5.iloc[-1]["flag"] =="down":
+            if  __data_line_5.iat[-3,4] =='second' or __data_line_5.iat[-3,5] =='yes':
+                __data_line_5.iat[-1, 6] = 'yes'
+                print(" here: "  +str(__data_line_5.iat[-1, 0]))
+    return 'no',0
+
             # second_result = second_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,__data_simple_5,code,i)
             # if second_result =='yes':
             #     grid_5_chart = chart_test(__data_simple_5, __data_deal_5, __data_line_5)
@@ -176,13 +178,14 @@ def first_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__dat
                     if flag>4 and (__deal(now_30_macd, last_30_macd)==1 or __deal(now_30_diff, last_30_diff)==1):
                         print('first buy :'+code+' '+str(__data_line_5.iloc[-1]["date"]) + ' '+str(flag1)+ ' '+str_1+str_2+str_3+str_4+str_5+str_6+str_7+str_8)
                         __data_line_5.iat[-1,5]='yes'
-                        return 'yes'
+                        return 'yes',__data_line_5.iloc[-1]["key"]
                     else:
                         # print('不行' + code + ' ' + str(__data_line_5.iloc[-1]["date"])+ ' '+str(flag1)+ ' '+str_1+str_2+str_3+str_4+str_5+str_6+str_7+str_8)
-                        return 'no'
+                        return 'no',0
             else:
                 # print('力度没有减小'+code+' '+str(__data_line_5.iloc[-1]["date"]) )
-                return 'no'
+                return 'no',0
+        return 'no', 0
 
 def second_first(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,__data_line_5,__data_simple_5,index,code,flag1):
 

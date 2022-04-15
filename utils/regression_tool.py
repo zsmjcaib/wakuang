@@ -87,7 +87,7 @@ def test(path,code,content):
     test_chart_5_path = content['test_chart_5_path']
     test_chart_30_path = content['test_chart_30_path']
     demo_path = content['demo_path']
-    test_5 = real_data[0:13000]
+    test_5 = real_data[0:5000]
     #初始化
     test_30 = import_csv(test_5,'30T')
     test_5_simple = test_5.iloc[0:10, 0:7].copy()
@@ -109,7 +109,7 @@ def test(path,code,content):
     test_5 = stock_macd(test_5)
     test_30 = stock_macd(test_30)
     #开始回测
-    for i, row in real_data[13000:].iterrows():
+    for i, row in real_data[5000:].iterrows():
 
         test_5 = test_5.append(row)
         test_5 = stock_macd(test_5)
@@ -133,21 +133,21 @@ def test(path,code,content):
             print(i)
         # print(i)
         # print(str(i)+' '+str(test_5_line.iat[-1,0])+' '+str(test_5_line.iat[-2,0])+' '+str(test_5_line.iat[-3,0]))
-        result = strategy_test(test_5,test_5_simple,test_5_deal,test_5_line,test_30,test_30_deal,test_30_line,code[:6],test_chart_5_path,i,test_chart_30_path,test_30_simple)
+        result,mark_price = strategy_test(test_5,test_5_simple,test_5_deal,test_5_line,test_30,test_30_deal,test_30_line,code[:6],test_chart_5_path,i,test_chart_30_path,test_30_simple)
         if  result == 'yes':
-            demo_first.loc[len(demo_first)] = [test_5.iat[- 1, 0], test_5.iat[- 1, 2], "", test_5.iat[- 2, 2], ""]
+            demo_first.loc[len(demo_first)] = [test_5.iat[- 1, 0], mark_price,test_5.iat[- 1, 2],"", "", test_5.iat[- 2, 2], ""]
         if test_5_line.iloc[-1]["small_to_large"] =='yes' or test_5_line.iloc[-2]["small_to_large"] =='yes':
-            result ,date = check(test_5_deal,test_5_line)
+            result ,date,mark_price = check(test_5_deal,test_5_line)
             if result == 'yes':
-                demo_small.loc[len(demo_small)] = [test_5.iat[- 1, 0],  test_5.iat[- 1, 2], "", test_5.iat[- 2, 2], ""]
+                demo_small.loc[len(demo_small)] = [test_5.iat[- 1, 0], mark_price, test_5.iat[- 1, 2],"", "", test_5.iat[- 2, 2], ""]
                 print('small to buy :' + code + ' '+str(i) + ' '+date+' now date'+ str(test_5.iat[-1,0]))
             # elif result == 'no':
             #     print('small to buy fail :' + code + ' '+str(i) + ' '+ str(test_5_line.iloc[-1]["date"]))
 
         if test_5_line.iat[-1,6] == 'yes' or test_5_line.iat[-2,6] == 'yes':
-            result, date = check_second(test_5_deal, test_5_line)
+            result, date,mark_price = check_second(test_5_deal, test_5_line)
             if result == 'yes':
-                demo_second.loc[len(demo_second)] = [test_5.iat[- 1, 0], test_5.iat[- 1, 2], "", test_5.iat[- 2, 2], ""]
+                demo_second.loc[len(demo_second)] = [test_5.iat[- 1, 0], mark_price,test_5.iat[- 1, 2], "","", test_5.iat[- 2, 2], ""]
 
                 print('second to buy :' + code + ' ' + str(i) + ' ' + date + ' now date ' + str(test_5.iat[-1, 0]))
             # elif result == 'no':
