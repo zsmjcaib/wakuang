@@ -23,14 +23,14 @@ def stock_lc5(file, target_file) -> None:
     # (通达信.lc5文件路径, 通达信.lc5文件名称, 处理后要保存到的文件夹)
     with open(file, 'rb') as f:  # 读取通达信.lc5文件，并处理
         file_object = open(target_file, 'w+')  # 打开新建的csv文件，开始写入数据
-        title_list = "date,open,high,low,close,amount,vol,diff,dea,macd\n"  # 定义csv文件标题
+        title_list = "date,open,high,low,close,vol,amount,diff,dea,macd\n"  # 定义csv文件标题
         file_object.writelines(title_list)  # 将文件标题写入到csv中
 
         while True:
             li2 = f.read(32)  # 读取一个5分钟数据
             if not li2:  # 如果没有数据了，就退出
                 break
-            data2 = struct.unpack('HHffffllf', li2)  # 解析数据
+            data2 = struct.unpack('HHffffflf', li2)  # 解析数据
             date_str = get_date_str(data2[0], data2[1])  # 解析日期和分时
 
             data2_list = list(data2)  # 将数据转成list
@@ -40,14 +40,15 @@ def stock_lc5(file, target_file) -> None:
 
             list3 = data2_list[0] + "," + \
                    str(round(data2_list[1],2)) + "," + str(round(data2_list[2],2)) + "," + str(
-                round(data2_list[3],2)) + "," + str(round(data2_list[4],2)) + "," + str(data2_list[5]) + "," + str(
-                data2_list[6]) + "\n"
+                round(data2_list[3],2)) + "," + str(round(data2_list[4],2)) + "," + str(data2_list[6]/100) + "," + str(
+                data2_list[5]) + "\n"
             file_object.writelines(list3)
 
         file_object.close()  # 完成数据写入
         df = pd.read_csv(target_file)
         data = getMacd.stock_macd(df)
-        data.tocsv(target_file, index=0)
+        data['date'] =  pd.to_datetime(data['date'], format='%Y-%m-%d')
+        data.to_csv(target_file, index=0)
 
 
 """
@@ -65,7 +66,7 @@ else:
     print("文件转换已完成")
 """
 if __name__ == '__main__':
-    list1=["sh","sz"]
+    list1=["sz","sh"]
     file_object_path = 'D:/project/data/stock/normal/5/'
 
     for l in list1:
@@ -73,4 +74,6 @@ if __name__ == '__main__':
         listfile = os.listdir(path)
         for i in listfile:
             if i.startswith("0",2)|i.startswith("30",2)|i.startswith("60",2):
-                stock_lc5(path + i, file_object_path+i[2:-4]+'.csv')
+                if  not os.path.exists(file_object_path+i[2:-4]+'.csv'):
+                    stock_lc5(path + i, file_object_path+i[2:-4]+'.csv')
+

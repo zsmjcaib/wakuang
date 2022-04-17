@@ -8,8 +8,10 @@ def simpleTrend(df,df_simple):
     #找第一个新增数据
     df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
     df_simple['date'] = pd.to_datetime(df_simple['date'], format='%Y-%m-%d')
+
     tem_data=df[df["date"]>df_simple.iloc[-1]["date"]]
     dfSimple = compare(df_simple,tem_data)
+    dfSimple.reset_index(drop=True, inplace=True)
     return dfSimple
 
 
@@ -57,7 +59,7 @@ if __name__ == '__main__':
     i='5'
     path = 'D:/project/data/stock/normal/' + i + '/'
     target_path = 'D:/project/data/stock/simple/' + i + '/'
-    code ='002627.csv'
+    code ='688580.csv'
 
 
 

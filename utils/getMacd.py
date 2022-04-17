@@ -6,7 +6,8 @@ def stock_macd(df):
                                     fastperiod=12,
                                     slowperiod=26,
                                     signalperiod=9)
-    df["diff"]=round(diff,2)
-    df["dea"] = round(dea,2)
-    df["macd"] = round(macd*2,2)
+    df = df.copy()
+    df["diff"]=round(diff*10,2)
+    df["dea"] = round(dea*10,2)
+    df["macd"] = round(macd*100,2)
     return df

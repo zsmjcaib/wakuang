@@ -13,30 +13,30 @@ def __find(df, df_line):
     if (len(df) < 5): return
     small=''
     try:
-        if df_line.iloc[-1]["small_to_large"] == 'yes' or df_line.iloc[-1]["small_to_large"] == 'second':
-            small_date = df_line.iloc[-1]["date"]
-            small = df_line.iloc[-1]["small_to_large"]
+        if df_line["small_to_large"].iloc[-1] == 'yes' or df_line["small_to_large"].iloc[-1] == 'second':
+            small_date = df_line["date"].iloc[-1]
+            small = df_line["small_to_large"].iloc[-1]
             # print("small out :" + str(df_line.iloc[-1]["date"])+" now "+ str(df.iloc[-1]["date"]))
-        elif df_line.iloc[-2]["small_to_large"] == 'yes' or df_line.iloc[-2]["small_to_large"] == 'second':
-            small_date = df_line.iloc[-2]["date"]
-            small = df_line.iloc[-2]["small_to_large"]
+        elif df_line["small_to_large"].iloc[-2] == 'yes' or df_line["small_to_large"].iloc[-2] == 'second':
+            small_date = df_line["date"].iloc[-2]
+            small = df_line["small_to_large"].iloc[-2]
             # print("small out :" + str(df_line.iloc[-2]["date"]) + " now " + str(df.iloc[-1]["date"]))
         else:small_date=''
     except:
         small_date=''
     try:
-        if df_line.iloc[-1]["first"] == 'yes':
+        if df_line["first"].iloc[-1] == 'yes':
             # print("first out :"+str(df_line.iloc[-1]["date"]))
-            first_date = df_line.iloc[-1]["date"]
-        elif df_line.iloc[-2]["first"] == 'yes':
+            first_date = df_line["date"].iloc[-1]
+        elif df_line["first"].iloc[-2] == 'yes':
             # print("first out :"+str(df_line.iloc[-2]["date"]))
-            first_date = df_line.iloc[-2]["date"]
+            first_date = df_line["date"].iloc[-2]
         else:first_date=''
     except:
         first_date=''
     try:
-        if df_line.iloc[-1]["second"] == 'yes':
-            second_date = df_line.iloc[-1]["date"]
+        if df_line["second"].iloc[-1] == 'yes':
+            second_date = df_line["date"].iloc[-1]
         else:second_date=''
     except:
         second_date=''
@@ -71,43 +71,43 @@ def __deal(index, df, df_line):
 
             if len(df_line) == 0:
                 i+=1
-                if df.iloc[i + 1]["key"] > df.iloc[i]["key"]:
+                if df["key"].iloc[i + 1] > df["key"].iloc[i]:
                     # 顶点
-                    if df.iloc[i + 3]["key"] > df.iloc[i + 1]["key"] and df.iloc[i + 3]["key"] >= df.iloc[i + 5]["key"]:
-                        if df.iloc[i + 4]["key"] >= df.iloc[i + 6]["key"]:
-                            df_line.loc[len(df_line)] = [df.iat[i + 3, 0], df.iloc[i + 3]["key"], "rise", "no","","",""]
+                    if df["key"].iloc[i + 3] > df["key"].iloc[i + 1] and df["key"].iloc[i + 3] >= df["key"].iloc[i + 5]:
+                        if df["key"].iloc[i + 4] >= df["key"].iloc[i + 6]:
+                            df_line.loc[len(df_line)] = [df.iat[i + 3, 0], df["key"].iloc[i + 3], "rise", "no","","",""]
                             i += 3
                         else:
                             try:
-                                flag = df.iloc[i + 6]["key"]
+                                flag = df["key"].iloc[i + 6]
                                 j = i + 8
                                 while j < len(df) - 1:
-                                    if df.iloc[j - 1]["key"] > df.iloc[i + 3]["key"]:
+                                    if df["key"].iloc[j - 1] > df["key"].iloc[i + 3]:
                                         i += 3
                                         break
-                                    elif df.iloc[j]["key"] < flag:
-                                        df_line.loc[len(df_line)] = [df.iat[i + 3, 0], df.iloc[i + 3]["key"], "rise", "no","","",""]
+                                    elif df["key"].iloc[j] < flag:
+                                        df_line.loc[len(df_line)] = [df.iat[i + 3, 0], df["key"].iloc[i + 3], "rise", "no","","",""]
                                         i += 3
                                         break
                                     else:i += 1
                             except:
                                 return
 
-                elif df.iloc[i + 1]["key"] < df.iloc[i]["key"]:
-                    if df.iloc[i + 3]["key"] < df.iloc[i + 1]["key"] and df.iloc[i + 3]["key"] <= df.iloc[i + 5]["key"]:
-                        if df.iloc[i + 4]["key"] <= df.iloc[i + 6]["key"]:
-                            df_line.loc[len(df_line)] = [df.iat[i + 3, 0], df.iloc[i + 3]["key"], "down", "no","","",""]
+                elif df["key"].iloc[i + 1] < df["key"].iloc[i]:
+                    if df["key"].iloc[i + 3] < df["key"].iloc[i + 1] and df["key"].iloc[i + 3] <= df["key"].iloc[i + 5]:
+                        if df["key"].iloc[i + 4] <= df["key"].iloc[i + 6]:
+                            df_line.loc[len(df_line)] = [df.iat[i + 3, 0], df["key"].iloc[i + 3], "down", "no","","",""]
                             i += 3
                         else:
                             try:
-                                flag = df.iloc[i + 6]["key"]
+                                flag = df["key"].iloc[i + 6]
                                 j = i + 8
                                 while j < len(df) - 1:
-                                    if (df.iloc[j - 1]["key"] < df.iloc[i + 3]["key"]):
+                                    if (df["key"].iloc[j - 1] < df["key"].iloc[i + 3]):
                                         i += 3
                                         break
-                                    elif (df.iloc[j]["key"] > flag):
-                                        df_line.loc[len(df_line)] = [df.iat[i + 3, 0], df.iloc[i + 3]["key"], "down", "no","","",""]
+                                    elif (df["key"].iloc[j] > flag):
+                                        df_line.loc[len(df_line)] = [df.iat[i + 3, 0], df["key"].iloc[i + 3], "down", "no","","",""]
                                         i += 3
                                         break
                                     else:i+=1
@@ -115,32 +115,32 @@ def __deal(index, df, df_line):
                                 return
 
             else:
-                if (df_line.iloc[-1]["flag"] == "down" and df_line.iloc[-1]["temp"] == "no" ) or \
-                        df_line.iloc[-1]["flag"] == "rise" and df_line.iloc[-1]["temp"] == "yes" :
-                    if (df.iloc[i + 5]["key"] > df.iloc[i + 3]["key"]):
+                if (df_line["flag"].iloc[-1] == "down" and df_line["temp"].iloc[-1] == "no" ) or \
+                        df_line["flag"].iloc[-1] == "rise" and df_line["temp"].iloc[-1] == "yes" :
+                    if (df["key"].iloc[i + 5] > df["key"].iloc[i + 3]):
                         i += 2
                         continue
                     # 第一种情况
-                    elif (df.iloc[i + 1]["key"] >= df.iloc[i + 4]["key"]):
+                    elif (df["key"].iloc[i + 1] >= df["key"].iloc[i + 4]):
                         i,result = __first_case(i, df, df_line)
                         if result == "wrong":
                             return
-                    elif df.iloc[i + 1]["key"] < df.iloc[i + 4]["key"]:
+                    elif df["key"].iloc[i + 1] < df["key"].iloc[i + 4]:
                         i,result = __second_case(i, df, df_line)
                         if result == "wrong":
                             return
 
-                elif (df_line.iloc[-1]["flag"] == "rise" and df_line.iloc[-1]["temp"] == "no" ) or\
-                        df_line.iloc[-1]["flag"] == "down" and df_line.iloc[-1]["temp"] == "yes":
-                    if (df.iloc[i + 5]["key"] < df.iloc[i + 3]["key"]):
+                elif (df_line["flag"].iloc[-1] == "rise" and df_line["temp"].iloc[-1] == "no" ) or\
+                        df_line["flag"].iloc[-1] == "down" and df_line["temp"].iloc[-1] == "yes":
+                    if (df["key"].iloc[i + 5] < df["key"].iloc[i + 3]):
                         i += 2
                         continue
                     # 第一种情况
-                    elif (df.iloc[i + 1]["key"] <= df.iloc[i + 4]["key"]):
+                    elif (df["key"].iloc[i + 1] <= df["key"].iloc[i + 4]):
                         i,result = __first_case(i, df, df_line)
                         if result == "wrong":
                             return
-                    elif (df.iloc[i + 1]["key"] > df.iloc[i + 4]["key"]):
+                    elif (df["key"].iloc[i + 1] > df["key"].iloc[i + 4]):
                         i,result = __second_case(i, df, df_line)
                         if result == "wrong":
                             return
@@ -151,32 +151,32 @@ def __deal(index, df, df_line):
 
 def __first_case(i, df, df_line):
     df_line.drop(df_line[df_line["temp"] == "yes"].index.tolist(), inplace=True)
-    if (df_line.iloc[-1]["flag"] == "down"):
+    if (df_line["flag"].iloc[-1] == "down"):
         try:
             j = i + 6
             while j < len(df) - 1:
-                if (df.iloc[j-1]["key"] > df.iloc[i + 3]["key"]):
+                if (df["key"].iloc[j-1] > df["key"].iloc[i + 3]):
                     return i + 4, "no"
-                elif (df.iloc[j]["key"] < df.iloc[j - 2]["key"]):
-                    df_line.loc[len(df_line)]=[df.iat[i + 3, 0],df.iloc[i + 3]["key"],"rise", "no","","",""]
-                    df_line.loc[len(df_line)]=[df.iat[j, 0],df.iloc[j]["key"],"down", "yes","","",""]
-                    i = df[df["date"] == df_line.iloc[-1]["date"]].index.tolist()[0] - 3
+                elif (df["key"].iloc[j] < df["key"].iloc[j - 2]):
+                    df_line.loc[len(df_line)]=[df.iat[i + 3, 0],df["key"].iloc[i + 3],"rise", "no","","",""]
+                    df_line.loc[len(df_line)]=[df.iat[j, 0],df["key"].iloc[j],"down", "yes","","",""]
+                    i = df[df["date"] == df_line["date"].iloc[-1]].index.tolist()[0] - 3
                     return i, "yes"
                 j += 2
             return i+2,"out"
         except:
             return 0, "wrong"
 
-    elif (df_line.iloc[-1]["flag"] == "rise"):
+    elif (df_line["flag"].iloc[-1] == "rise"):
         try:
             j = i + 6
             while j < len(df) - 1:
-                if (df.iloc[j-1]["key"] < df.iloc[i + 3]["key"]):
+                if (df["key"].iloc[j-1] < df["key"].iloc[i + 3]):
                     return i + 4, "no"
-                elif (df.iloc[j]["key"] > df.iloc[j - 2]["key"]):
-                    df_line.loc[len(df_line)] = [df.iat[i + 3, 0], df.iloc[i + 3]["key"], "down", "no","","",""]
-                    df_line.loc[len(df_line)] = [df.iat[j, 0], df.iloc[j]["key"], "rise", "yes","","",""]
-                    i = df[df["date"] == df_line.iloc[-1]["date"]].index.tolist()[0] - 3
+                elif (df["key"].iloc[j] > df["key"].iloc[j - 2]):
+                    df_line.loc[len(df_line)] = [df.iat[i + 3, 0], df["key"].iloc[i + 3], "down", "no","","",""]
+                    df_line.loc[len(df_line)] = [df.iat[j, 0], df["key"].iloc[j], "rise", "yes","","",""]
+                    i = df[df["date"] == df_line["date"].iloc[-1]].index.tolist()[0] - 3
                     return i, "yes"
                 j += 2
             return i+2,"out"
@@ -186,51 +186,53 @@ def __first_case(i, df, df_line):
 
 def __second_case(i, df, df_line):
     df_line.drop(df_line[df_line["temp"] == "yes"].index.tolist(), inplace=True)
-    if (df_line.iloc[-1]["flag"] == "down"):
+    if (df_line["flag"].iloc[-1] == "down"):
         index = i + 5
         while index < len(df) :
-            if df.iloc[index]["key"] > df.iloc[i + 3]["key"]:
+            if df["key"].iloc[index] > df["key"].iloc[i + 3]:
                 return i + 4,"no"
-            elif df.iloc[index-1]["key"] < df.iloc[i + 4]["key"]:
-                df_line.loc[len(df_line)] = [df.iat[i + 3, 0], df.iloc[i + 3]["key"], "rise", "no","","",""]
-                df_line.loc[len(df_line)] = [df.iat[index-1, 0], df.iloc[index-1]["key"], "down", "yes","","",""]
-                i = df[df["date"] == df_line.iloc[-1]["date"]].index.tolist()[0] - 3
+            elif df["key"].iloc[index-1] < df["key"].iloc[i + 4]:
+                df_line.loc[len(df_line)] = [df.iat[i + 3, 0], df["key"].iloc[i + 3], "rise", "no","","",""]
+                df_line.loc[len(df_line)] = [df.iat[index-1, 0], df["key"].iloc[index-1], "down", "yes","","",""]
+                i = df[df["date"] == df_line["date"].iloc[-1]].index.tolist()[0] - 3
                 return i,"yes"
             index +=2
         return i + 2, "out"
-    elif (df_line.iloc[-1]["flag"] == "rise"):
+    elif (df_line["flag"].iloc[-1] == "rise"):
         index = i + 5
         while index < len(df) :
-            if df.iloc[index]["key"] < df.iloc[i + 3]["key"]:
+            if df["key"].iloc[index] < df["key"].iloc[i + 3]:
                 return i + 4,"no"
-            elif df.iloc[index-1]["key"] > df.iloc[i + 4]["key"]:
-                df_line.loc[len(df_line)] = [df.iat[i + 3, 0], df.iloc[i + 3]["key"], "down", "no","","",""]
-                df_line.loc[len(df_line)] = [df.iat[index-1, 0], df.iloc[index-1]["key"], "rise", "yes","","",""]
-                i = df[df["date"] == df_line.iloc[-1]["date"]].index.tolist()[0] - 3
+            elif df["key"].iloc[index-1] > df["key"].iloc[i + 4]:
+                df_line.loc[len(df_line)] = [df.iat[i + 3, 0], df["key"].iloc[i + 3], "down", "no","","",""]
+                df_line.loc[len(df_line)] = [df.iat[index-1, 0], df["key"].iloc[index-1], "rise", "yes","","",""]
+                i = df[df["date"] == df_line["date"].iloc[-1]].index.tolist()[0] - 3
                 return i,"yes"
             index += 2
         return i + 2, "out"
 
 
 def  __last(df, df_line,small_date,first_date,second_date,small ):
-    if len(df_line) == 0 or df[df["date"] == df_line.iat[-1,0]].index.tolist()[0] +3 > len(df):
-        if small_date == df_line.iloc[-1]["date"]:
+    if len(df_line) == 0:
+        return
+    if df[df["date"] == df_line.iat[-1,0]].index.tolist()[0] +3 > len(df):
+        if small_date == df_line["date"].iloc[-1]:
             df_line.iat[-1, 4] = small
             # print("small in :" + str(df_line.iloc[-1]["date"]))
-        if small_date == df_line.iloc[-2]["date"]:
+        if small_date == df_line["date"].iloc[-2]:
             df_line.iat[-2, 4] = small
             # print("small in :" + str(df_line.iloc[-2]["date"]))
-        if first_date == df_line.iloc[-1]["date"]:
+        if first_date == df_line["date"].iloc[-1]:
             df_line.iat[-1, 5] = "yes"
             # print("first in :" + str(df_line.iloc[-1]["date"]))
 
-        if second_date == df_line.iloc[-1]["date"]:
+        if second_date == df_line["date"].iloc[-1]:
             df_line.iat[-1, 6] = "yes"
         return
     else:
         #后面第一个点
         index = df[df["date"] == df_line.iat[-1, 0]].index.tolist()[0]+1
-        flag = df_line.iloc[-1]["flag"]
+        flag = df_line["flag"].iloc[-1]
         if flag == "rise":
             #找低点
             key = df["key"].iloc[index:].min()
@@ -290,39 +292,39 @@ def  __last(df, df_line,small_date,first_date,second_date,small ):
         #                 index = i
         #         i+=1
 
-    if small_date == df_line.iloc[-1]["date"] :
+    if small_date == df_line["date"].iloc[-1] :
         df_line.iat[-1,4]=small
         # print("small in :" + str(df_line.iloc[-1]["date"]))
-    if small_date == df_line.iloc[-2]["date"]:
+    if small_date == df_line["date"].iloc[-2]:
         df_line.iat[-2, 4] = small
         # print("small in :" + str(df_line.iloc[-2]["date"]))
-    if first_date == df_line.iloc[-1]["date"] :
+    if first_date == df_line["date"].iloc[-1] :
         df_line.iat[-1,5]="yes"
         # print("first in :" + str(df_line.iloc[-1]["date"]))
 
-    if second_date == df_line.iloc[-1]["date"]:
+    if second_date == df_line["date"].iloc[-1]:
         df_line.iat[-1, 6] = "yes"
 
 if __name__ == '__main__':
 
-    # file="D:\project\data\stock\\deal\\5\\002940.csv"
-    # target_file ="D:\project\data\stock\\line\\5\\002940.csv"
-    # find_line(file, target_file)
-    target = ['5','30']
-    for i in target:
-        path = 'D:\project\data\stock\\deal\\' + i + '\\'
-        target_path = 'D:\project\data\stock\\line\\' + i + '\\'
-        for file_code in os.listdir(path):
-            if file_code not in os.listdir(target_path):
-                df = pd.read_csv(path + file_code)
-                if not os.path.exists(target_path+file_code):
-                    file_object = open(target_path+file_code, 'w+')
-                    list = (
-                            "date" + "," + "key" + "," + "flag" + ",temp" + "\n")
-                    file_object.writelines(list)
-                    file_object.close()
-                df_line = pd.read_csv(target_path+file_code)
+    file="D:\project\data\stock\\deal\\5\\688260.csv"
+    target_file ="D:\project\data\stock\\line\\5\\688260.csv"
+    line = pd.DataFrame(columns=['date', 'key', 'flag', 'temp', 'small_to_large', 'first', 'second'])
+    df = pd.read_csv(file)
 
-
-                find_line(df, df_line)
-                df_line.to_csv(target_path +file_code, index=0)
+    find_line(df, line)
+    # target = ['5','30']
+    # for i in target:
+    #     path = 'D:\project\data\stock\\deal\\' + i + '\\'
+    #     target_path = 'D:\project\data\stock\\line\\' + i + '\\'
+    #     for file_code in os.listdir(path):
+    #         if file_code not in os.listdir(target_path):
+    #             df = pd.read_csv(path + file_code)
+    #             if not os.path.exists(target_path+file_code):
+    #                 df_line = pd.DataFrame(columns=['date', 'key', 'flag', 'temp', 'small_to_large', 'first', 'second'])
+    #             else:
+    #                 df_line = pd.read_csv(target_path+file_code)
+    #
+    #
+    #             df_line = find_line(df, df_line)
+                # df_line.to_csv(target_path +file_code, index=0)

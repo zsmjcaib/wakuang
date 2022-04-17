@@ -8,7 +8,7 @@ def stock_csv(file, target_file):
     with open(file, 'rb') as f:
 
         file_object = open(target_file, 'w+')
-        list=("date"+","+"open"+","+"high"+","+"low"+","+"close"+","+"amount"+","+"vol"+","
+        list=("date"+","+"open"+","+"high"+","+"low"+","+"close"+","+"vol"+","+"amount"+","
                                         +"diff"+","+"dea"+","+"macd"+"\n")
         file_object.writelines(list)
         while True:
@@ -35,10 +35,10 @@ def stock_csv(file, target_file):
             stock_reservation = struct.unpack("l", stock_reservation)  # 保留值
             date_format = datetime.datetime.strptime(str(stock_date[0]), '%Y%M%d')  # 格式化日期
             list= date_format.strftime('%Y-%M-%d')+","+\
-                str(stock_open[0]/100)+","+str(stock_high[0]/100.0)+","+str(stock_low[0]/100.0)+","+str(stock_close[0]/100.0)+","+str(stock_amount[0])+","+str(stock_vol[0])+"\n"
+                str(stock_open[0]/100)+","+str(stock_high[0]/100.0)+","+str(stock_low[0]/100.0)+","+str(stock_close[0]/100.0)+","+str(stock_vol[0]/100)+","+str(stock_amount[0])+"\n"
             file_object.writelines(list)
         file_object.close()
-        getMacd.stock_macd(target_file)
+        # getMacd.stock_macd(target_file)
 
 
 

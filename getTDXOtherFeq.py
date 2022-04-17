@@ -13,8 +13,8 @@ def csv_resample(df, rule) -> pd.DataFrame:
     df_high = round(df['high'].resample(rule=rule, closed='right', label='left').max(), 2)
     df_low = round(df['low'].resample(rule=rule, closed='right', label='left').min(), 2)
     df_close = round(df['close'].resample(rule=rule, closed='right', label='left').last(), 2)
-    df_volume = round(df['vol'].resample(rule=rule, closed='right', label='left').sum(), 2)
     df_amount = round(df['amount'].resample(rule=rule, closed='right', label='left').sum(), 2)
+    df_volume = round(df['vol'].resample(rule=rule, closed='right', label='left').sum(), 2)
     # print("新周期数据已生成")
     # 生成新周期数据
     df_15t = pd.DataFrame()
@@ -22,8 +22,8 @@ def csv_resample(df, rule) -> pd.DataFrame:
     df_15t = df_15t.assign(high=df_high)
     df_15t = df_15t.assign(low=df_low)
     df_15t = df_15t.assign(close=df_close)
-    df_15t = df_15t.assign(amount=df_amount)
     df_15t = df_15t.assign(vol=df_volume)
+    df_15t = df_15t.assign(amount=df_amount)
     # 去除空值
     df_15t = df_15t.dropna()
 

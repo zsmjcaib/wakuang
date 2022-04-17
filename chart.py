@@ -1,7 +1,7 @@
 import os
 import numpy as np
 #绘图相关
-
+import pandas as pd
 from pyecharts import options as opts
 from pyecharts.commons.utils import JsCode
 from pyecharts.charts import Kline,Line,Bar,Grid,Scatter
@@ -27,6 +27,7 @@ def draw_kline(df,deal,line):
 
     # -----K线处理------------------
     ohlc = df[['open', 'close', 'low', 'high']]  # oclh结构
+    df['vol']=0
     v = df['vol']
     data = np.array(ohlc).tolist()  # 通过np转为list
     volumn = np.array(v).tolist()
@@ -223,7 +224,11 @@ if __name__ == '__main__':
         target_path = 'D:\project\data\stock\chart\\'+i+'\\'
         line_path = 'D:\project\data\stock\line\\'+i+'\\'
         for file_code in os.listdir(line_path):
-            draw_kline(simple_path + file_code, target_path, deal_path + file_code,line_path+file_code)
+            df = pd.read_csv(simple_path + file_code)
+            deal = pd.read_csv(deal_path + file_code)
+            line = pd.read_csv(line_path+file_code)
+            chart = draw_kline(df, deal,line)
+            chart.render(target_path + file_code.split('.')[0] + ".html")
 
 
     # file_code = '002627.csv'

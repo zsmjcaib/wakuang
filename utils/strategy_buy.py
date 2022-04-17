@@ -31,9 +31,9 @@ def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30
     index = __data_simple_5[__data_simple_5["date"] == __data_line_5.iloc[-1]["date"]].index.tolist()[0]
     if index == len(__data_simple_5) -3:
         #最后不能太无力
-        if (__data_simple_5.iloc[-3]["close"]<=__data_simple_5.iloc[-1]["close"] or __data_simple_5.iloc[-1]["close"]>=__data_simple_5.iloc[-3]["open"])\
-                and  (__data_simple_5.iloc[-1]["high"]>__data_simple_5.iloc[-2]["high"] or __data_simple_5.iloc[-1]["close"]>__data_simple_5.iloc[-3]["high"]
-                or __data_simple_5.iloc[-1]["close"]>(__data_simple_5.iloc[-3]["high"]+__data_simple_5.iloc[-3]["close"])/2)\
+        if (__data_simple_5["close"].iloc[-3]<=__data_simple_5["close"].iloc[-1] or __data_simple_5["close"].iloc[-1]>=__data_simple_5["open"].iloc[-3])\
+                and  (__data_simple_5["high"].iloc[-1]>__data_simple_5["high"].iloc[-2] or __data_simple_5["close"].iloc[-1]>__data_simple_5["high"].iloc[-3]
+                or __data_simple_5["close"].iloc[-1]>(__data_simple_5["high"].iloc[-3]+__data_simple_5["close"].iloc[-3])/2)\
             and __data_simple_5.iat[-4,0]+datetime.timedelta(minutes=-30)<=__data_line_30.iat[-1,0]<__data_simple_5.iat[-1,0]+datetime.timedelta(minutes=30):
             first_result ,mark_price= first_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,__data_simple_5,-1,code,i)
             return first_result,mark_price
@@ -48,7 +48,7 @@ def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30
             #     grid_30_chart = chart_test(__data_simple_30, __data_deal_30, __data_line_30)
             #     grid_30_chart.render(test_chart_30_path + code[:6] + '_' + str(i) + "failfirst.html")
         #     return
-        elif __data_line_5.iat[-1,1]>__data_line_5.iat[-3,1] and __data_line_5.iloc[-1]["flag"] =="down":
+        elif __data_line_5.iat[-1,1]>__data_line_5.iat[-3,1] and __data_line_5["flag"].iloc[-1] =="down":
             if  __data_line_5.iat[-3,4] =='second' or __data_line_5.iat[-3,5] =='yes':
                 __data_line_5.iat[-1, 6] = 'yes'
                 print(" here: "  +str(__data_line_5.iat[-1, 0]))
@@ -91,24 +91,24 @@ def first_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__dat
             #比较最后一段与密集成交前一段力度
             now_5_end_index = __data_5[__data_5["date"] == __data_line_5.iloc[i]["date"]].index.tolist()[0]
             #判断现在力度是否在减小
-            if __data_5.iloc[now_5_end_index]['macd']<=__data_5.iloc[now_5_end_index+1]['macd']<=__data_5.iloc[now_5_end_index+2]['macd']\
+            if __data_5.iloc[now_5_end_index]['macd']<=__data_5['macd'].iloc[now_5_end_index+1]<=__data_5['macd'].iloc[now_5_end_index+2]\
                     or __data_5.iloc[now_5_end_index]['macd']>0:
-                now_5_start_index = __data_5[__data_5["date"] == __data_line_5.iloc[i-1]["date"]].index.tolist()[0]
+                now_5_start_index = __data_5[__data_5["date"] == __data_line_5["date"].iloc[i-1]].index.tolist()[0]
                 df = __data_5.iloc[now_5_start_index:now_5_end_index + 1]
                 now_5_macd = df[df['macd'] < 0]['macd'].sum()*1.2
                 now_5_macd_min = df['macd'].min()
                 df = __data_5.iloc[now_5_start_index:now_5_end_index + 1]
                 now_5_diff = df[df['diff'] < 0]["diff"].min()*1.2
-                last_5_end_index = __data_5[__data_5["date"] == __data_line_5.iloc[last_5_start_index+1]["date"]].index.tolist()[0]
-                last_5_start_index = __data_5[__data_5["date"] == __data_line_5.iloc[last_5_start_index]["date"]].index.tolist()[0]
+                last_5_end_index = __data_5[__data_5["date"] == __data_line_5["date"].iloc[last_5_start_index+1]].index.tolist()[0]
+                last_5_start_index = __data_5[__data_5["date"] == __data_line_5["date"].iloc[last_5_start_index]].index.tolist()[0]
                 df = __data_5.iloc[last_5_start_index:last_5_end_index + 1]
                 last_5_macd = df[df['macd'] < 0]["macd"].sum()
                 last_5_macd_min = df['macd'].min()
                 df = __data_5.iloc[last_5_start_index:last_5_end_index + 1]
                 last_5_diff = df[df['diff'] < 0]["diff"].min()
 
-                now_30_start_index = __data_30[__data_30["date"] == __data_line_30.iloc[i-1]["date"]].index.tolist()[0]
-                now_30_end_index = __data_30[__data_30["date"] == __data_line_30.iloc[i]["date"]].index.tolist()[0]
+                now_30_start_index = __data_30[__data_30["date"] == __data_line_30["date"].iloc[i-1]].index.tolist()[0]
+                now_30_end_index = __data_30[__data_30["date"] == __data_line_30["date"].iloc[i]].index.tolist()[0]
                 df = __data_30.iloc[now_30_start_index:now_30_end_index + 1]
                 now_30_macd = df[df['macd'] < 0]["macd"].sum()*1.2
                 now_30_macd_min = df['macd'].min()
@@ -116,20 +116,20 @@ def first_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__dat
                 now_30_diff = df[df['diff'] < 0]["diff"].min()*1.2
                 # last_30_start_index = __data_30[__data_30["date"] == __data_line_30.iloc[i-5]["date"]].index.tolist()[0]
                 # last_30_end_index = __data_30[__data_30["date"] == __data_line_30.iloc[i-4]["date"]].index.tolist()[0]
-                last_30_end_index = __data_30[__data_30["date"] == __data_line_30.iloc[last_30_start_index+1]["date"]].index.tolist()[0]
-                last_30_start_index = __data_30[__data_30["date"] == __data_line_30.iloc[last_30_start_index]["date"]].index.tolist()[0]
+                last_30_end_index = __data_30[__data_30["date"] == __data_line_30["date"].iloc[last_30_start_index+1]].index.tolist()[0]
+                last_30_start_index = __data_30[__data_30["date"] == __data_line_30["date"].iloc[last_30_start_index]].index.tolist()[0]
                 df = __data_30.iloc[last_30_start_index:last_30_end_index + 1]
                 last_30_macd = df[df['macd'] < 0]["macd"].sum()
                 last_30_macd_min = df['macd'].min()
                 df = __data_30.iloc[last_30_start_index:last_30_end_index + 1]
                 last_30_diff = df[df['diff'] < 0]["diff"].min()
 
-                now_1_end_index =  __data_deal_5[__data_deal_5["date"] ==__data_line_5.iloc[i]["date"]].index.tolist()[0]
-                now_1_start_index =  __data_5[__data_5["date"] ==__data_deal_5.iloc[now_1_end_index-1]["date"]].index.tolist()[0]
+                now_1_end_index =  __data_deal_5[__data_deal_5["date"] ==__data_line_5["date"].iloc[i]].index.tolist()[0]
+                now_1_start_index =  __data_5[__data_5["date"] ==__data_deal_5["date"].iloc[now_1_end_index-1]].index.tolist()[0]
                 df = __data_5.iloc[now_1_start_index:now_5_end_index+1]
                 now_1_macd = df[df['macd'] < 0]['macd'].sum()*1.2
                 now_1_macd_vaule = __data_5.iloc[now_5_end_index+1]['macd']
-                last_1_start_index = __data_deal_5[__data_deal_5["date"] == __data_line_5.iloc[i-1]["date"]].index.tolist()[0]
+                last_1_start_index = __data_deal_5[__data_deal_5["date"] == __data_line_5["date"].iloc[i-1]].index.tolist()[0]
                 last_1_end_index = now_1_end_index
                 last_1 =  __data_deal_5[last_1_start_index:last_1_end_index-1].reset_index()
                 last_1_macd = find_last_1_macd(last_1,__data_5,"down")
@@ -176,9 +176,9 @@ def first_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__dat
                         flag += 1
                         str_8 = '30分钟macd值 '
                     if flag>4 and (__deal(now_30_macd, last_30_macd)==1 or __deal(now_30_diff, last_30_diff)==1):
-                        print('first buy :'+code+' '+str(__data_line_5.iloc[-1]["date"]) + ' '+str(flag1)+ ' '+str_1+str_2+str_3+str_4+str_5+str_6+str_7+str_8)
+                        print('first buy :'+code+' '+str(__data_line_5["date"].iloc[-1]) + ' '+str(flag1)+ ' '+str_1+str_2+str_3+str_4+str_5+str_6+str_7+str_8)
                         __data_line_5.iat[-1,5]='yes'
-                        return 'yes',__data_line_5.iloc[-1]["key"]
+                        return 'yes',__data_line_5["key"].iloc[-1]
                     else:
                         # print('不行' + code + ' ' + str(__data_line_5.iloc[-1]["date"])+ ' '+str(flag1)+ ' '+str_1+str_2+str_3+str_4+str_5+str_6+str_7+str_8)
                         return 'no',0
@@ -365,13 +365,13 @@ def third_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, _
 
 def __volume_case(data,i = 0):
 
-    i2 = data.iloc[i-2]["key"]
-    i3 = data.iloc[i-3]["key"]
-    i4 = data.iloc[i-4]["key"]
-    i5 = data.iloc[i-5]["key"]
+    i2 = data["key"].iloc[i-2]
+    i3 = data["key"].iloc[i-3]
+    i4 = data["key"].iloc[i-4]
+    i5 = data["key"].iloc[i-5]
     high = max(i2, i3, i4, i5)
     low = min(i2, i3, i4, i5)
-    if data.iloc[i-2]["flag"] == 'rise':
+    if data["flag"].iloc[i-2] == 'rise':
         if __assess(i2,i5) == "yes":
             zhigh = min(i2, i4)
             zlow = max(i5, i3)
@@ -403,9 +403,9 @@ def __deal(gt,lt):
 def measure(df,index):
     for i in range(len(df)-2 + index,2,-2):
         #不是最低点
-        if df.iloc[i]["key"]<df.iloc[-1]["key"]:
+        if df["key"].iloc[i]<df["key"].iloc[-1]:
             return -1
-        if df.iloc[i]["key"]>df.iloc[-1]["key"] and df.iloc[i-1]["key"]>df.iloc[-2]["key"]:
+        if df["key"].iloc[i]>df["key"].iloc[-1] and df["key"].iloc[i-1]>df["key"].iloc[-2]:
             return i-1
     return -1
 
@@ -415,8 +415,8 @@ def find_last_1_macd(df,data,flag):
     temp = 0
     if flag =='down':
         while i<len(df):
-            first = data[data["date"] == df.iloc[i]["date"]].index.tolist()[0]
-            second = data[data["date"] == df.iloc[i+1]["date"]].index.tolist()[0]
+            first = data[data["date"] == df["date"].iloc[i]].index.tolist()[0]
+            second = data[data["date"] == df["date"].iloc[i+1]].index.tolist()[0]
             new_data = data.iloc[first:second]
             macd = new_data[new_data['macd'] < 0]['macd'].sum()
             if macd >temp:
@@ -425,8 +425,8 @@ def find_last_1_macd(df,data,flag):
             i += 2
     else:
         while i<len(df):
-            first = data[data["date"] == df.iloc[i]["date"]].index.tolist()[0]
-            second = data[data["date"] == df.iloc[i+1]["date"]].index.tolist()[0]
+            first = data[data["date"] == df["date"].iloc[i]].index.tolist()[0]
+            second = data[data["date"] == df["date"].iloc[i+1]].index.tolist()[0]
             new_data = data.iloc[first:second]
             macd = new_data[new_data['macd'] > 0]['macd'].sum()
             if macd <temp:

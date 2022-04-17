@@ -62,17 +62,17 @@ def __deal(index, df, df_point,max_list,min_list,ignore_list):
         key=0
         flag=None
     if (flag is None):
-        if (df.iloc[index - 1]["low"] <= df.iloc[index]["low"] and df.iloc[index - 1]["low"] <= df.iloc[index - 2]["low"]):
-            return "min", index - 1, df.iloc[index - 1]["low"]
+        if (df["low"].iloc[index - 1] <= df["low"].iloc[index] and df["low"].iloc[index - 1] <= df["low"].iloc[index - 2]):
+            return "min", index - 1, df["low"].iloc[index - 1]
             # 判断顶点
-        elif (df.iloc[index - 1]["high"] >= df.iloc[index]["high"] and df.iloc[index - 1]["high"] >= df.iloc[index - 2]["high"]):
-            return "max", index - 1, df.iloc[index - 1]["high"]
+        elif (df["high"].iloc[index - 1] >= df["high"].iloc[index] and df["high"].iloc[index - 1] >= df["high"].iloc[index - 2]):
+            return "max", index - 1, df["high"].iloc[index - 1]
 
         return "no", -1, -1
     last_index = df[df["date"] == df_point.iat[-1, 0]].index.tolist()[0]
 
     #判断顶点
-    if(df.iloc[index-1]["high"]>=df.iloc[index]["high"] and df.iloc[index-1]["high"]>=df.iloc[index-2]["high"]):
+    if(df["high"].iloc[index-1]>=df["high"].iloc[index] and df["high"].iloc[index-1]>=df["high"].iloc[index-2]):
         if(flag == "min" and last_index+3<index):
             #更新低点,并忽略前一点
             if min_list !=[]:
@@ -84,9 +84,9 @@ def __deal(index, df, df_point,max_list,min_list,ignore_list):
             if max_list!=[]:
                 max_list.pop()
             df_point.iat[-1, 3] = "no"
-            return "max", index - 1, df.iloc[index - 1]["high"]
+            return "max", index - 1, df["high"].iloc[index - 1]
         #更新顶点
-        if(flag == "max" and key<=df.iloc[index-1]["high"]):
+        if(flag == "max" and key<=df["high"].iloc[index-1]):
             df_point.drop(df_point.tail(1).index, inplace=True)
             if max_list != []:
                 max_list.pop()
@@ -94,21 +94,21 @@ def __deal(index, df, df_point,max_list,min_list,ignore_list):
                 min_index = min_list.pop(-1)
                 df_point.iat[-1,0] = df.iat[min_index,0]
                 df_point.iat[-1, 1] = df.iat[min_index, 3]
-            return "max", index - 1, df.iloc[index - 1]["high"]
+            return "max", index - 1, df["high"].iloc[index - 1]
         if flag == "min" and df[df["date"] == df_point.iat[-1, 0]].index.tolist()[0]+3>=index\
                 and len(df_point)>2:
-            if df.iloc[index-1]["high"]>=df_point.iat[-2,1]:
+            if df["high"].iloc[index-1]>=df_point.iat[-2,1]:
                 max_list.append(index-1)
 
         # # 更新高点
-        # if flag == "min" and df_point.iat[-1, 3] == "yes" and df.iloc[index]["low"]<=df_point.iat[-1, 1] and \
-        #         len(df_point)>2 and df_point.iat[-2, 1]<df.iloc[index-1]["high"]:
+        # if flag == "min" and df_point.iat[-1, 3] == "yes" and df["low"].iloc[index]<=df_point.iat[-1, 1] and \
+        #         len(df_point)>2 and df_point.iat[-2, 1]<df["high"].iloc[index-1]:
         #     df_point.drop(df_point.tail(2).index, inplace=True)
-        #     return "max", index - 1, df.iloc[index - 1]["high"]
+        #     return "max", index - 1, df["high"].iloc[index - 1]
 
         return "no", -1, -1
     # 判断低点
-    elif(df.iloc[index-1]["low"]<=df.iloc[index]["low"] and df.iloc[index-1]["low"]<=df.iloc[index-2]["low"]):
+    elif(df["low"].iloc[index-1]<=df["low"].iloc[index] and df["low"].iloc[index-1]<=df["low"].iloc[index-2]):
 
         if(flag == "max" and  last_index+3<index):
             #更新顶点,并忽略前一点
@@ -121,9 +121,9 @@ def __deal(index, df, df_point,max_list,min_list,ignore_list):
             if min_list!=[]:
                 min_list.pop()
             df_point.iat[-1, 3] = "no"
-            return "min", index - 1, df.iloc[index - 1]["low"]
+            return "min", index - 1, df["low"].iloc[index - 1]
         #更新低点
-        if(flag == "min" and key>=df.iloc[index-1]["low"]) :
+        if(flag == "min" and key>=df["low"].iloc[index-1]) :
             df_point.drop(df_point.tail(1).index, inplace=True)
             if min_list != []:
                 # min_index = min_list[-1]
@@ -132,17 +132,17 @@ def __deal(index, df, df_point,max_list,min_list,ignore_list):
                 max_index = max_list.pop(-1)
                 df_point.iat[-1, 0] = df.iat[max_index, 0]
                 df_point.iat[-1, 1] = df.iat[max_index, 2]
-            return "min", index - 1, df.iloc[index - 1]["low"]
+            return "min", index - 1, df["low"].iloc[index - 1]
         #加入不符合条件的更低点
         if flag == "max" and df[df["date"] == df_point.iat[-1, 0]].index.tolist()[0]+3>=index\
             and len(df_point)>2:
-            if df.iloc[index-1]["low"]<=df_point.iat[-2,1]:
+            if df["low"].iloc[index-1]<=df_point.iat[-2,1]:
                 min_list.append(index-1)
         # # 更新低点
-        # if flag == "max" and df_point.iat[-1, 3] == "yes" and df.iloc[index]["high"]>=df_point.iat[-1, 1]\
-        #         and len(df_point)>2 and df_point.iat[-2, 1]>df.iloc[index-1]["low"]:
+        # if flag == "max" and df_point.iat[-1, 3] == "yes" and df["high"].iloc[index]>=df_point.iat[-1, 1]\
+        #         and len(df_point)>2 and df_point.iat[-2, 1]>df["low"].iloc[index-1]:
         #     df_point.drop(df_point.tail(2).index, inplace=True)
-        #     return "min", index - 1, df.iloc[index - 1]["low"]
+        #     return "min", index - 1, df["low"].iloc[index - 1]
         return "no", -1, -1
     else:
         return "no", -1, -1
@@ -240,7 +240,7 @@ if __name__ == '__main__':
 
     path = 'D:\project\data\stock\simple\\5\\'
     target_path = 'D:\project\data\stock\\deal\\5\\'
-    file_code = '002627.csv'
+    file_code = '688580.csv'
     df = pd.read_csv(path + file_code)
     if not os.path.exists(target_path + file_code):
         file_object = open(target_path + file_code, 'w+')

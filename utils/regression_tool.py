@@ -68,8 +68,8 @@ def stock_macd(df) -> pd.DataFrame:
         index = df_temp[df_temp['macd'] == ''].index.tolist()
         if index!=[]:
             df_normal = df[index[0]-33:]
-            df_normal = macd(df_normal)
-            df = df[:index[0]-33].append(df_normal)
+            df_normal = stock_macd(df_normal)
+            df = df[:index[0]].append(df_normal[33:])
 
         return df
 
@@ -100,8 +100,8 @@ def test(path,code,content):
     else:
         test_5_deal = pd.read_csv(test_deal_5_path + code)
         test_30_deal = pd.read_csv(test_deal_30_path + code)
-        test_5_line = pd.read_csv(test_deal_5_path + code)
-        test_30_line = pd.read_csv(test_deal_30_path + code)
+        test_5_line = pd.read_csv(test_line_5_path + code)
+        test_30_line = pd.read_csv(test_line_30_path + code)
     demo_first = read_record(demo_path,code,'first')
     demo_second = read_record(demo_path,code,'second')
     demo_small = read_record(demo_path,code,'small')
@@ -117,8 +117,6 @@ def test(path,code,content):
         test_30 = stock_macd(test_30)
         test_5_simple =simpleTrend(test_5,test_5_simple)
         test_30_simple =simpleTrend(test_30,test_30_simple)
-        test_5_simple.reset_index(drop=True, inplace=True)
-        test_30_simple.reset_index(drop=True, inplace=True)
         test_5_deal = find_point(test_5_simple, test_5_deal)
         test_30_deal = find_point(test_30_simple, test_30_deal)
         test_5_line = find_line(test_5_deal , test_5_line)
@@ -169,26 +167,26 @@ def test(path,code,content):
             check_sell(demo_small, test_5,'small')
 
 
-        if i%1000 ==0:
-            # test_5.to_csv(test_normal_5_path+code[:6]+'_'+str(i) +'.csv')
-            # test_30.to_csv(test_normal_30_path+code[:6]+'_'+str(i) +'.csv')
-            # test_5_simple.to_csv(test_simple_5_path+code[:6]+'_'+str(i) +'.csv')
-            # test_30_simple.to_csv(test_simple_30_path+code[:6]+'_'+str(i) +'.csv')
-            # test_5_deal.to_csv(test_deal_5_path+code[:6]+'_'+str(i) +'.csv')
-            # test_30_deal.to_csv(test_deal_30_path+code[:6]+'_'+str(i) +'.csv')
-            # test_5_line.to_csv(test_line_5_path+code[:6]+'_'+str(i) +'.csv')
-            # test_30_line.to_csv(test_line_30_path+code[:6]+'_'+str(i) +'.csv')
-            grid_5_chart = chart_test(test_5_simple,test_5_deal,test_5_line)
-            grid_5_chart.render(test_chart_5_path+code[:6]+'_'+str(i) + ".html")
-            grid_30_chart = chart_test(test_30_simple, test_30_deal, test_30_line)
-            grid_30_chart.render(test_chart_30_path + code[:6] + '_' + str(i) + ".html")
+        # if i%1000 ==0:
+        #     # test_5.to_csv(test_normal_5_path+code[:6]+'_'+str(i) +'.csv')
+        #     # test_30.to_csv(test_normal_30_path+code[:6]+'_'+str(i) +'.csv')
+        #     # test_5_simple.to_csv(test_simple_5_path+code[:6]+'_'+str(i) +'.csv')
+        #     # test_30_simple.to_csv(test_simple_30_path+code[:6]+'_'+str(i) +'.csv')
+        #     # test_5_deal.to_csv(test_deal_5_path+code[:6]+'_'+str(i) +'.csv')
+        #     # test_30_deal.to_csv(test_deal_30_path+code[:6]+'_'+str(i) +'.csv')
+        #     # test_5_line.to_csv(test_line_5_path+code[:6]+'_'+str(i) +'.csv')
+        #     # test_30_line.to_csv(test_line_30_path+code[:6]+'_'+str(i) +'.csv')
+        #     grid_5_chart = chart_test(test_5_simple,test_5_deal,test_5_line)
+        #     grid_5_chart.render(test_chart_5_path+code[:6]+'_'+str(i) + ".html")
+        #     grid_30_chart = chart_test(test_30_simple, test_30_deal, test_30_line)
+        #     grid_30_chart.render(test_chart_30_path + code[:6] + '_' + str(i) + ".html")
     grid_5_chart = chart_test(test_5_simple, test_5_deal, test_5_line)
     grid_5_chart.render(test_chart_5_path + code[:6] + '_' + 'last' + ".html")
     grid_30_chart = chart_test(test_30_simple, test_30_deal, test_30_line)
     grid_30_chart.render(test_chart_30_path + code[:6] + '_' + 'last' + ".html")
-    demo_first.to_csv(demo_path+code[:6] +'_first.csv')
-    demo_small.to_csv(demo_path + code[:6] + '_small.csv')
-    demo_second.to_csv(demo_path + code[:6] + '_second.csv')
+    demo_first.to_csv(demo_path+code[:6] +'_first.csv', index=False)
+    demo_small.to_csv(demo_path + code[:6] + '_small.csv', index=False)
+    demo_second.to_csv(demo_path + code[:6] + '_second.csv', index=False)
 
 
 
