@@ -392,10 +392,6 @@ def third_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, _
                     print('third buy :' + code + ' ' + str(__data_line_5.iloc[-1]["date"]))
                     #return 'yes'
 
-
-
-
-
 def __volume_case(data,i = 0):
 
     i2 = data["key"].iloc[i-2]
