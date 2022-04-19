@@ -5,6 +5,7 @@ import pandas as pd
 from pyecharts import options as opts
 from pyecharts.commons.utils import JsCode
 from pyecharts.charts import Kline,Line,Bar,Grid,Scatter
+import yaml
 
 
 
@@ -215,20 +216,23 @@ def chart_test(df,deal,line):
 if __name__ == '__main__':
     # target = ['5','30', 'day']
     target = ['5','30']
+    with open('config.yaml') as f:
+        content = yaml.load(f, Loader=yaml.FullLoader)
+        f.close()
 
     for i in target:
-
+        path = content['path']
+        simple_path = content['simple_'+str(i)+'_path']
+        line_path = content['line_'+str(i)+'_path']
+        deal_path = content['deal_'+str(i)+'_path']
+        chart_path = content['chart_'+str(i)+'_path']
         # path = 'D:\project\data\stock\\normal\\'+i+'\\'
-        simple_path = 'D:\project\data\stock\simple\\'+i+'\\'
-        deal_path = 'D:\project\data\stock\\deal\\'+i+'\\'
-        target_path = 'D:\project\data\stock\chart\\'+i+'\\'
-        line_path = 'D:\project\data\stock\line\\'+i+'\\'
         for file_code in os.listdir(line_path):
             df = pd.read_csv(simple_path + file_code)
             deal = pd.read_csv(deal_path + file_code)
             line = pd.read_csv(line_path+file_code)
             chart = draw_kline(df, deal,line)
-            chart.render(target_path + file_code.split('.')[0] + ".html")
+            chart.render(chart_path + file_code.split('.')[0] + ".html")
 
 
     # file_code = '002627.csv'

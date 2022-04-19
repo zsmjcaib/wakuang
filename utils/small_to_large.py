@@ -32,19 +32,20 @@ def check_sell(df,data,flag):
     if df.iat[-1,5] == '' or df.iat[-1,5] < data["high"].iloc[-1]:
         df.iat[-1, 5] = data["high"].iloc[-1]
     if str(df.iat[-1,0])[:10]==  str(data.iat[-1,0])[:10]:
-        return
+        return ''
     #强制
     if df.iat[-1,1]>data["close"].iloc[-1] and df.iat[-1,4]=='':
         df.iat[-1,4] = str(data.iat[-1,0])+'_'+str(data["close"].iloc[-1])
         df.iat[-1,3] =str(data.iat[-1,0])+'_'+str(data["close"].iloc[-1])
+        return '止损' + str(data.iat[-1,0])+'_'+str(data["close"].iloc[-1])
     #退出等待
     high_profit = df.iat[-1, 5] /df.iat[-1, 2]
     if high_profit>1.1:
         if df.iat[-1, 5]/data["close"].iloc[-1]>(high_profit-1)/3+1:
             df.iat[-1, 4] = str(data.iat[-1, 0]) + '_' + str(data["close"].iloc[-1])
             df.iat[-1, 3] = str(data.iat[-1, 0]) + '_' + str(data["close"].iloc[-1])
-
-
+            return '止盈' + str(data.iat[-1, 0]) + '_' + str(data["close"].iloc[-1])
+    return ''
 
 
 

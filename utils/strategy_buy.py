@@ -3,29 +3,62 @@ import os
 from chart import chart_test
 import datetime
 import time
+from utils.util import read_record
+from utils.small_to_large import check, check_second,check_sell
+def strategy(content,code):
+    demo_path = content['demo_path']
 
+    __data_line_5 = pd.read_csv(content['line_5_path']+code)
+    __data_simple_5 = pd.read_csv(content['simple_5_path'] + code)
+    __data_5 = pd.read_csv(content['normal_5_path'] + code)
+    __data_deal_5 = pd.read_csv(content['deal_5_path'] + code)
+    demo_first = read_record(demo_path, code, 'first')
+    demo_small = read_record(demo_path, code, 'small')
+    demo_second = read_record(demo_path, code, 'second')
 
-def strategy(path,code):
-
-    __data_30 = pd.read_csv(path+'normal\\30\\'+code)
-    __data_5 = pd.read_csv(path+'normal\\5\\'+code)
-    __data_deal_30 = pd.read_csv(path+'deal\\30\\'+code)
-    __data_deal_5 = pd.read_csv(path+'deal\\5\\'+code)
-    __data_line_30 = pd.read_csv(path+'line\\30\\'+code)
-    __data_line_5 = pd.read_csv(path+'line\\5\\'+code)
-    __data_simple_5 = pd.read_csv(path + 'simple\\5\\' + code)
-    # __hold = pd.read_csv()
     index = __data_simple_5[__data_simple_5["date"] == __data_line_5.iloc[1]["date"]].index.tolist()[0]
-    if index == len(__data_simple_5) -2:
-        first_result = first_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,-1)
-        if first_result =='yes':
-            return
-        second_result = second_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5)
-        if second_result =='yes':
-            return
-        third_result = third_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5)
-        if third_result =='yes':
-            return
+    if index == len(__data_simple_5) - 3:
+        __data_line_30 = pd.read_csv(content['line_30_path'] + code)
+        # 最后不能太无力
+        if (__data_simple_5["close"].iloc[-3] <= __data_simple_5["close"].iloc[-1] or __data_simple_5["close"].iloc[-1] >= __data_simple_5["open"].iloc[-3]) \
+                and (__data_simple_5["high"].iloc[-1] > __data_simple_5["high"].iloc[-2] or __data_simple_5["close"].iloc[-1] > __data_simple_5["high"].iloc[-3]
+                or __data_simple_5["close"].iloc[-1] > (__data_simple_5["high"].iloc[-3] + __data_simple_5["close"].iloc[-3]) / 2) \
+                and __data_simple_5.iat[-4, 0] + datetime.timedelta(minutes=-30) <= __data_line_30.iat[-1, 0] <__data_simple_5.iat[-1, 0] + datetime.timedelta(minutes=30):
+            __data_30 = pd.read_csv(content['normal_30_path'] + code)
+            __data_deal_30 = pd.read_csv(content['deal_30_path'] + code)
+
+            first_result ,mark_price= first_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5,__data_simple_5,-1,code)
+            if first_result =='yes':
+                demo_first.loc[len(demo_first)] = [__data_5.iat[- 1, 0], mark_price, __data_5.iat[- 1, 2], "", "",
+                                                   __data_5.iat[- 2, 2], ""]
+                demo_first.to_csv(demo_path + code[:6] + '_first.csv', index=False)
+
+
+    elif __data_line_5.iloc[-1]["small_to_large"] =='yes' or __data_line_5.iloc[-2]["small_to_large"] =='yes':
+            result ,date,mark_price = check(__data_5,__data_line_5)
+            if result == 'yes':
+                demo_small.loc[len(demo_small)] = [__data_5.iat[- 1, 0], mark_price, __data_5.iat[- 1, 2],"", "", __data_5.iat[- 2, 2], ""]
+                demo_small.to_csv(demo_path + code[:6] + '_small.csv', index=False)
+                return 'small to buy :' + code +' '+date+' now date'+ str(__data_5.iat[-1,0])
+    elif __data_line_5.iat[-1,6] == 'yes' or __data_line_5.iat[-2,6] == 'yes':
+            result, date,mark_price = check_second(__data_deal_5, __data_line_5)
+            if result == 'yes':
+                demo_second.loc[len(demo_second)] = [__data_5.iat[- 1, 0], mark_price,__data_5.iat[- 1, 2], "","", __data_5.iat[- 2, 2], ""]
+                demo_second.to_csv(demo_path + code[:6] + '_second.csv', index=False)
+                return 'second to buy :' + code + ' ' + date + ' now date ' + str(__data_5.iat[-1, 0])
+    elif len(demo_first) > 1 and demo_first.iat[-1, 4] == '':
+        return check_sell(demo_first, __data_5, 'first')
+    elif len(demo_second) > 1 and demo_second.iat[-1, 4] == '':
+        return check_sell(demo_second, __data_5, 'second')
+    elif len(demo_small) > 1 and demo_small.iat[-1, 4] == '':
+        return check_sell(demo_small, __data_5, 'small')
+    return ''
+        # second_result = second_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5)
+        # if second_result =='yes':
+        #     return
+        # third_result = third_buying_situation(__data_30, __data_5, __data_deal_30, __data_deal_5, __data_line_30, __data_line_5)
+        # if third_result =='yes':
+        #     return
 
 def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30,__data_deal_30,__data_line_30,code,test_chart_5_path,i,test_chart_30_path,__data_simple_30):
     index = __data_simple_5[__data_simple_5["date"] == __data_line_5.iloc[-1]["date"]].index.tolist()[0]
@@ -74,7 +107,7 @@ def strategy_test(__data_5,__data_simple_5,__data_deal_5,__data_line_5,__data_30
 
 
 
-def first_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,__data_line_5,__data_simple_5,index,code,flag1):
+def first_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,__data_line_5,__data_simple_5,index,code,flag1=''):
 
     if 1:
         zhigh_5, zlow_5,high_5,low_5 =__volume_case( __data_line_5,index+1)
@@ -176,7 +209,7 @@ def first_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__dat
                         flag += 1
                         str_8 = '30分钟macd值 '
                     if flag>4 and (__deal(now_30_macd, last_30_macd)==1 or __deal(now_30_diff, last_30_diff)==1):
-                        print('first buy :'+code+' '+str(__data_line_5["date"].iloc[-1]) + ' '+str(flag1)+ ' '+str_1+str_2+str_3+str_4+str_5+str_6+str_7+str_8)
+                        # print('first buy :'+code+' '+str(__data_line_5["date"].iloc[-1]) + ' '+str(flag1)+ ' '+str_1+str_2+str_3+str_4+str_5+str_6+str_7+str_8)
                         __data_line_5.iat[-1,5]='yes'
                         return 'yes',__data_line_5["key"].iloc[-1]
                     else:

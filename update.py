@@ -2,7 +2,7 @@ from typing import Dict
 import efinance as ef
 import pandas as pd
 from multiprocessing import Process
-from datetime import datetime
+from datetime import datetime,timedelta
 import yaml
 import os
 from utils.point import simpleTrend
@@ -11,17 +11,22 @@ from utils.deal import find_point
 from utils.line import find_line
 
 
-def update(stock_codes,content):
-
+def update(stock_codes,content,date = 'all'):
+    if date == 'all':
+        now = datetime.now()
+        delta32 = timedelta(days=32)
+        beg = (now - delta32).date().strftime('%Y-%m-%d')
+    else:
+        beg = datetime.now().date().strftime('%Y-%m-%d')
     for freq in [5,30]:
         # 数据间隔时间为 5 分钟
         total = len(stock_codes)
-        each = int(total  / 30)
+        each = int(total / 30)
 
         start = 0
         end = each
         while end<=total:
-            df_5: Dict[str, pd.DataFrame] = ef.stock.get_quote_history(stock_codes[start:end], klt=freq, beg='20220325')
+            df_5: Dict[str, pd.DataFrame] = ef.stock.get_quote_history(stock_codes[start:end], klt=freq, beg=beg)
             for stock_code, df in df_5.items():
                 if len(df) == 0:
                     continue
@@ -34,11 +39,11 @@ def deal(content,df,freq):
     simple_path = content['simple_'+str(freq)+'_path']
     deal_path = content['deal_'+str(freq)+'_path']
     line_path = content['line_'+str(freq)+'_path']
-    code =  df.iat[0,1]+'.csv'
+    code = df.iat[0,1]+'.csv'
     if not os.path.exists(normal_path + code):
-        normal =  pd.DataFrame(columns=['date','open','high','low','close','amount','vol','diff','dea','macd'])
+        normal = pd.DataFrame(columns=['date','open','high','low','close','amount','vol','diff','dea','macd'])
     else:
-        normal =  pd.read_csv(normal_path + code)
+        normal = pd.read_csv(normal_path + code)
     df.drop(axis=1, columns=['股票名称', '股票代码','振幅','涨跌幅','涨跌额','换手率'],inplace=True)
     df.columns = ['date', 'open', 'high', 'low', 'close', 'amount', 'vol']
     df[['high', 'close']] = df[['close', 'high']]
@@ -50,7 +55,9 @@ def deal(content,df,freq):
     if len(normal)>0:
         normal['date'] = pd.to_datetime(normal['date'], format='%Y-%m-%d')
         #复牌直接加在后面
-        try:normal_index = df[df['date'] == normal.iat[-1,0]].index.tolist()[-1]
+        try:
+            normal_index = df[df['date'] == normal.iat[-2,0]].index.tolist()[-1]
+            normal.drop(normal.tail(1).index, inplace=True)
         except:normal_index = 0
         normal = normal.append(df[normal_index+1:],ignore_index=True)
     else:
