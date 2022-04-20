@@ -35,15 +35,17 @@ def start(target_codes,content,lock):
             time.sleep(sleep if sleep > 0 else 11)
             continue
         else:
-            update(target_codes,content,beg)
+            codes = target_codes['code'].tolist()
+            update(codes,content,beg)
             beg = 'today'
-            for code in target_codes:
-                result = strategy(content,code['code'])
+            for code in codes:
+                result = strategy(content,code+'.csv')
                 if result !='':
                     robot.send_text('我比sbf少个f'+' '+result)
 
 
         mark_end = time.time()
+        print('睡眠')
         time.sleep(300 - mark_end + mark_start)
 
 
@@ -53,13 +55,17 @@ if __name__ == '__main__':
         f.close()
     target_codes = pd.read_csv(content['list_path']+'list.csv',converters={'code': str})
     for index,code in target_codes.iterrows():
-        if code['init'] =='0':
-            init()
+        if code['init'] ==0:
+            init(code['code']+'.csv',content)
+            target_codes['init'].iloc[index] = 1
+            target_codes.to_csv(content['list_path']+'list.csv',index=False)
     lock = mp.Lock()
-
-    p1 = Process(target=start, args=())
-    # p2 = Process(target=start, args=())
-
+    #
+    # p1 = Process(target=start, args=(target_codes,content,lock))
+    # # p2 = Process(target=start, args=())
+    #
+    # p1.start()
+    # start(target_codes,content,lock)
 
 
 

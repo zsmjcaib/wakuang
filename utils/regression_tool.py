@@ -4,7 +4,7 @@ from chart import chart_test
 from utils.point import simpleTrend
 from utils.deal import find_point
 from utils.line import find_line
-from utils.strategy_buy import strategy_test,first_buying_situation
+from utils.strategy_buy import strategy_test,first_buying_init
 from utils.small_to_large import check, check_second,check_sell
 from utils.util import read_record
 from utils.strategy_sell import strategy_sell
@@ -74,7 +74,7 @@ def stock_macd(df) -> pd.DataFrame:
         return df
 
 
-def test(path,code,content,i):
+def test(code,content):
     real_data = pd.read_csv(content['normal_5_path'] + code)
     test_normal_5_path = content['test_normal_5_path']
     test_normal_30_path = content['test_normal_30_path']
@@ -188,8 +188,7 @@ def test(path,code,content,i):
     demo_small.to_csv(demo_path + code[:6] + '_small.csv', index=False)
     demo_second.to_csv(demo_path + code[:6] + '_second.csv', index=False)
 
-def init(code,content,i):
-    real_data = pd.read_csv(content['normal_5_path'] + code)
+def init(code,content):
     test_normal_30_path = content['normal_30_path']
     test_simple_5_path = content['simple_5_path']
     test_simple_30_path = content['simple_30_path']
@@ -200,24 +199,31 @@ def init(code,content,i):
     test_chart_5_path = content['chart_5_path']
     test_chart_30_path = content['chart_30_path']
     demo_path = content['result']
-    test_5 = real_data[0:i]
+    test_5 = pd.read_csv(content['normal_5_path'] + code)
+    test_5['date'] = pd.to_datetime(test_5['date'], format='%Y-%m-%d')
     #初始化
     test_30 = pd.read_csv(test_normal_30_path+code)
+    test_30['date'] = pd.to_datetime(test_30['date'], format='%Y-%m-%d')
     test_5_simple = pd.read_csv(test_simple_5_path+code)
     test_30_simple = pd.read_csv(test_simple_30_path+code)
 
     test_5_deal = pd.read_csv(test_deal_5_path + code)
+    test_5_deal['date'] = pd.to_datetime(test_5_deal['date'], format='%Y-%m-%d')
     test_30_deal = pd.read_csv(test_deal_30_path + code)
     test_5_line = pd.read_csv(test_line_5_path + code)
+    test_5_line['date'] = pd.to_datetime(test_5_line['date'], format='%Y-%m-%d')
     test_30_line = pd.read_csv(test_line_30_path + code)
+    test_30_line['date'] = pd.to_datetime(test_30_line['date'], format='%Y-%m-%d')
     demo_first = read_record(demo_path,code,'first')
     demo_second = read_record(demo_path,code,'second')
     demo_small = read_record(demo_path,code,'small')
 
-    test_5 = stock_macd(test_5)
+
     #开始
-    for index, row in test_5_line.iterrows():
-        result,mark_price = first_buying_situation(test_30,test_5,test_30_deal,test_5_deal,test_30_line,test_5_line,test_5_simple,index,code)
+    for index, row in test_30_line.iterrows():
+        if index<4:
+            continue
+        result,mark_price = first_buying_init(test_30,test_5,test_30_deal,test_5_deal,test_30_line,test_5_line,test_5_simple,index,code)
         if  result == 'yes':
             demo_first.loc[len(demo_first)] = [test_5.iat[- 1, 0], mark_price,test_5.iat[- 1, 2],"", "", test_5.iat[- 2, 2], ""]
         if test_5_line.iloc[-1]["small_to_large"] =='yes' or test_5_line.iloc[-2]["small_to_large"] =='yes':

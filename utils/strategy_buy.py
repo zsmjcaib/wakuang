@@ -220,6 +220,129 @@ def first_buying_situation(__data_30,__data_5,__data_deal_30,__data_deal_5,__dat
                 return 'no',0
         return 'no', 0
 
+def first_buying_init(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,__data_line_5,__data_simple_5,index,code,flag1=''):
+
+    if 1:
+        zhigh_5, zlow_5,high_5,low_5 =__volume_case( __data_line_5,index+1)
+        # zhigh_30, zlow_30, high_30, low_30 = __volume_case(__data_line_30)
+        #找到密集成交区间
+        index_30 = index     #-1
+        #30分钟起点
+
+        temp = (__data_line_30['date'].iloc[index_30] - __data_line_5['date'])<datetime.timedelta(minutes=60)
+        temp2 = datetime.timedelta(minutes=-60)<(__data_line_30['date'].iloc[index_30] - __data_line_5['date'])
+        index_5 = temp2[temp2 & temp].index.tolist()
+        if index_5!=[]:
+            index_5 = index_5[0]
+        else:
+            return 'no',0
+        last_30_start_index = measure(__data_line_30,index_30)
+        i=index_5
+        last_5_start_index = measure(__data_line_5,i)
+        #确定下降
+        if  __data_line_5.iloc[i]["key"] < low_5 and last_5_start_index != -1 \
+                and __data_line_5.iloc[i]["flag"] =="down"  and last_30_start_index != -1 :
+            flag =0
+            #比较最后一段与密集成交前一段力度
+            print(i)
+            now_5_end_index = __data_5[__data_5["date"] == __data_line_5["date"].iloc[i]].index.tolist()[0]
+            #判断现在力度是否在减小
+            if __data_5.iloc[now_5_end_index]['macd']<=__data_5['macd'].iloc[now_5_end_index+1]<=__data_5['macd'].iloc[now_5_end_index+2]\
+                    or __data_5.iloc[now_5_end_index]['macd']>0:
+                now_5_start_index = __data_5[__data_5["date"] == __data_line_5["date"].iloc[i-1]].index.tolist()[0]
+                df = __data_5.iloc[now_5_start_index:now_5_end_index + 1]
+                now_5_macd = df[df['macd'] < 0]['macd'].sum()*1.2
+                now_5_macd_min = df['macd'].min()
+                df = __data_5.iloc[now_5_start_index:now_5_end_index + 1]
+                now_5_diff = df[df['diff'] < 0]["diff"].min()*1.2
+                last_5_end_index = __data_5[__data_5["date"] == __data_line_5["date"].iloc[last_5_start_index+1]].index.tolist()[0]
+                last_5_start_index = __data_5[__data_5["date"] == __data_line_5["date"].iloc[last_5_start_index]].index.tolist()[0]
+                df = __data_5.iloc[last_5_start_index:last_5_end_index + 1]
+                last_5_macd = df[df['macd'] < 0]["macd"].sum()
+                last_5_macd_min = df['macd'].min()
+                df = __data_5.iloc[last_5_start_index:last_5_end_index + 1]
+                last_5_diff = df[df['diff'] < 0]["diff"].min()
+
+                now_30_start_index = __data_30[__data_30["date"] == __data_line_30["date"].iloc[index_30-1]].index.tolist()[0]
+                now_30_end_index = __data_30[__data_30["date"] == __data_line_30["date"].iloc[index_30]].index.tolist()[0]
+                df = __data_30.iloc[now_30_start_index:now_30_end_index + 1]
+                now_30_macd = df[df['macd'] < 0]["macd"].sum()*1.2
+                now_30_macd_min = df['macd'].min()
+                df = __data_30.iloc[now_30_start_index:now_30_end_index + 1]
+                now_30_diff = df[df['diff'] < 0]["diff"].min()*1.2
+                # last_30_start_index = __data_30[__data_30["date"] == __data_line_30.iloc[i-5]["date"]].index.tolist()[0]
+                # last_30_end_index = __data_30[__data_30["date"] == __data_line_30.iloc[i-4]["date"]].index.tolist()[0]
+                last_30_end_index = __data_30[__data_30["date"] == __data_line_30["date"].iloc[last_30_start_index+1]].index.tolist()[0]
+                last_30_start_index = __data_30[__data_30["date"] == __data_line_30["date"].iloc[last_30_start_index]].index.tolist()[0]
+                df = __data_30.iloc[last_30_start_index:last_30_end_index + 1]
+                last_30_macd = df[df['macd'] < 0]["macd"].sum()
+                last_30_macd_min = df['macd'].min()
+                df = __data_30.iloc[last_30_start_index:last_30_end_index + 1]
+                last_30_diff = df[df['diff'] < 0]["diff"].min()
+
+                now_1_end_index =  __data_deal_5[__data_deal_5["date"] ==__data_line_5["date"].iloc[i]].index.tolist()[0]
+                now_1_start_index =  __data_5[__data_5["date"] ==__data_deal_5["date"].iloc[now_1_end_index-1]].index.tolist()[0]
+                df = __data_5.iloc[now_1_start_index:now_5_end_index+1]
+                now_1_macd = df[df['macd'] < 0]['macd'].sum()*1.2
+                now_1_macd_vaule = __data_5.iloc[now_5_end_index+1]['macd']
+                last_1_start_index = __data_deal_5[__data_deal_5["date"] == __data_line_5["date"].iloc[i-1]].index.tolist()[0]
+                last_1_end_index = now_1_end_index
+                last_1 =  __data_deal_5[last_1_start_index:last_1_end_index-1].reset_index()
+                last_1_macd = find_last_1_macd(last_1,__data_5,"down")
+
+                print('123')
+                if __data_line_5.iloc[-1]["flag"] =="down":
+                    str_1 ='5分钟macd不行 '
+                    str_2 ='5分钟diff不行 '
+                    str_3 ='30分钟macd不行 '
+                    str_4 ='30分钟diff不行 '
+                    str_5 ='1分钟macd不行 '
+                    str_6 = '1分钟macd不背离 '
+                    str_7 = '5分钟macd值不行 '
+                    str_8 = '30分钟macd值不行 '
+                    str_9 = '1分钟macd不背离 '
+
+
+
+
+                    if  __deal(now_5_macd,last_5_macd) == 1:
+                        str_1 = '5分钟macd '
+                        flag += 1
+                    if __deal(now_5_diff, last_5_diff) ==1:
+                        str_2 = '5分钟diff '
+                        flag += 1
+                    if __deal(now_30_macd, last_30_macd)==1:
+                        str_3 = '30分钟macd '
+                        flag += 1
+                    if __deal(now_30_diff, last_30_diff)==1:
+                        str_4 = '30分钟diff '
+                        flag += 1
+                    if __deal(now_1_macd, last_1_macd)==1:
+                        str_5 = '1分钟macd '
+                        flag += 1
+                    if now_1_macd_vaule>0 or now_1_macd_vaule>now_5_macd_min*0.3:
+                        flag += 1
+                        str_6 = '1分钟macd严重背离 '
+                        __data_line_5.iat[-1,4] = 'yes'
+                    if now_5_macd_min*1.1>last_5_macd_min:
+                        flag += 1
+                        str_7 = '5分钟macd值 '
+                    if now_30_macd_min * 1.1 > last_30_macd_min:
+                        flag += 1
+                        str_8 = '30分钟macd值 '
+                    if flag>4 and (__deal(now_30_macd, last_30_macd)==1 or __deal(now_30_diff, last_30_diff)==1):
+                        # print('first buy :'+code+' '+str(__data_line_5["date"].iloc[-1]) + ' '+str(flag1)+ ' '+str_1+str_2+str_3+str_4+str_5+str_6+str_7+str_8)
+                        __data_line_5.iat[-1,5]='yes'
+                        return 'yes',__data_line_5["key"].iloc[-1]
+                    else:
+                        # print('不行' + code + ' ' + str(__data_line_5.iloc[-1]["date"])+ ' '+str(flag1)+ ' '+str_1+str_2+str_3+str_4+str_5+str_6+str_7+str_8)
+                        return 'no',0
+            else:
+                # print('力度没有减小'+code+' '+str(__data_line_5.iloc[-1]["date"]) )
+                return 'no',0
+        return 'no', 0
+
+
 def second_first(__data_30,__data_5,__data_deal_30,__data_deal_5,__data_line_30,__data_line_5,__data_simple_5,index,code,flag1):
 
     if 1:
@@ -430,11 +553,13 @@ def __deal(gt,lt):
         return 0
 
 def measure(df,index):
+    if index>=0:
+        index = index - len(df)
     for i in range(len(df)-2 + index,2,-2):
         #不是最低点
-        if df["key"].iloc[i]<df["key"].iloc[-1]:
+        if df["key"].iloc[i]<df["key"].iloc[index]:
             return -1
-        if df["key"].iloc[i]>df["key"].iloc[-1] and df["key"].iloc[i-1]>df["key"].iloc[-2]:
+        if df["key"].iloc[i]>df["key"].iloc[index] and df["key"].iloc[i-1]>df["key"].iloc[index-1]:
             return i-1
     return -1
 

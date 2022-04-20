@@ -22,7 +22,7 @@ def update(stock_codes,content,date = 'all'):
         # 数据间隔时间为 5 分钟
         total = len(stock_codes)
         each = int(total / 30)
-
+        each = each if each!=0 else 1
         start = 0
         end = each
         while end<=total:
