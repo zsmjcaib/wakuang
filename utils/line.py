@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import yaml
 
 
 def find_line(df, df_line):
@@ -306,9 +307,10 @@ def  __last(df, df_line,small_date,first_date,second_date,small ):
         df_line.iat[-1, 6] = "yes"
 
 if __name__ == '__main__':
-
-    file="D:\project\data\stock\\deal\\5\\688260.csv"
-    target_file ="D:\project\data\stock\\line\\5\\688260.csv"
+    with open('../config.yaml') as f:
+        content = yaml.load(f, Loader=yaml.FullLoader)
+        f.close()
+    file=content['deal_30_path']+'688125.csv'
     line = pd.DataFrame(columns=['date', 'key', 'flag', 'temp', 'small_to_large', 'first', 'second'])
     df = pd.read_csv(file)
 

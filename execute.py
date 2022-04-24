@@ -25,13 +25,17 @@ def start(target_codes,content,lock):
     open_noon = datetime.datetime.strptime(date + ' ' + '13:00:00', "%Y-%m-%d %H:%M:%S")
     time_point = [open_time, close_noon, open_noon, close_time]
     while time_point:
+        now = datetime.datetime.now()
+        print(now)
         mark_start = time.time()
         if time_point[0] < now:
+            print('pop')
             time_point.pop(0)
             continue
         diff = (time_point[0] - now).seconds
         if len(time_point) % 2 == 0:
             sleep = diff - 30
+            print(sleep if sleep > 0 else 11)
             time.sleep(sleep if sleep > 0 else 11)
             continue
         else:
@@ -46,6 +50,7 @@ def start(target_codes,content,lock):
 
         mark_end = time.time()
         print('睡眠')
+        print(300 - mark_end + mark_start)
         time.sleep(300 - mark_end + mark_start)
 
 
@@ -61,11 +66,11 @@ if __name__ == '__main__':
             target_codes.to_csv(content['list_path']+'list.csv',index=False)
     lock = mp.Lock()
     #
-    # p1 = Process(target=start, args=(target_codes,content,lock))
+    p1 = Process(target=start, args=(target_codes,content,lock))
     # # p2 = Process(target=start, args=())
     #
     # p1.start()
-    # start(target_codes,content,lock)
+    start(target_codes,content,lock)
 
 
 

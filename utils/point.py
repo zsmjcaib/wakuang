@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-
+import yaml
 def simpleTrend(df,df_simple):
 
 
@@ -56,22 +56,21 @@ def calculation(row,dfSimple) -> pd.DataFrame:
     return dfSimple
 
 if __name__ == '__main__':
+    with open('../config.yaml') as f:
+        content = yaml.load(f, Loader=yaml.FullLoader)
+        f.close()
     i='5'
-    path = 'D:/project/data/stock/normal/' + i + '/'
-    target_path = 'D:/project/data/stock/simple/' + i + '/'
-    code ='688580.csv'
+    path = content['normal_30_path']+'688125.csv'
+    target_path = content['simple_30_path']+'688125.csv'
+    df = pd.read_csv(path)
+    df_simple = pd.read_csv(target_path)
 
 
 
 
+    df = simpleTrend(df,df_simple)
+    df.to_csv(target_path,index=False)
 
-    df = pd.read_csv(path+code)
-    if os.path.exists(target_path+code):
-        df_simple = pd.read_csv(target_path+code)
-    else:
-        df_simple = df.iloc[0:10, 0:7].copy()
-    df = simpleTrend(df, df_simple)
-    df.to_csv(target_path+code)
 
 
 

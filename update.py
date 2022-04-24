@@ -22,10 +22,9 @@ def update(stock_codes,content,date = 'all'):
         # 数据间隔时间为 5 分钟
         total = len(stock_codes)
         each = int(total / 30)
-        each = each if each!=0 else 1
         start = 0
         end = each
-        while end<=total:
+        while end<=total+each:
             df_5: Dict[str, pd.DataFrame] = ef.stock.get_quote_history(stock_codes[start:end], klt=freq, beg=beg)
             for stock_code, df in df_5.items():
                 if len(df) == 0:
@@ -77,10 +76,13 @@ def deal(content,df,freq):
         line = pd.DataFrame(columns=['date', 'key', 'flag', 'temp','small_to_large','first','second'])
     else:
         line = pd.read_csv(line_path + code)
-
-    simple = simpleTrend(normal,simple)
-    deal = find_point(simple,deal)
-    line = find_line(deal,line)
+    try:
+        simple = simpleTrend(normal,simple)
+        deal = find_point(simple,deal)
+        line = find_line(deal,line)
+    except:
+        print(freq)
+        print(code)
     simple.to_csv(simple_path + code, index=False)
     deal.to_csv(deal_path + code, index=False)
     line.to_csv(line_path + code, index=False)
@@ -90,6 +92,7 @@ def macd(df) -> pd.DataFrame:
         return df
     if 'macd' not in df.columns:
         df = stock_macd(df)
+
         return df
     else:
         df_temp = df[33:]
@@ -121,6 +124,6 @@ if __name__ == '__main__':
     p4.start()
     p5.start()
     p6.start()
-    # update(df.iloc[0:each,0].tolist())
+    # update(df.iloc[0:each,0].tolist(),content)
 
 

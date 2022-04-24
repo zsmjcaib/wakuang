@@ -238,9 +238,9 @@ def __deal_temp(df, df_point,max_list,min_list):
 
 if __name__ == '__main__':
 
-    path = 'D:\project\data\stock\simple\\5\\'
-    target_path = 'D:\project\data\stock\\deal\\5\\'
-    file_code = '688580.csv'
+    path = 'D:\project\data\stock\simple\\30\\'
+    target_path = 'D:\project\data\stock\\deal\\30\\'
+    file_code = '688125.csv'
     df = pd.read_csv(path + file_code)
     if not os.path.exists(target_path + file_code):
         file_object = open(target_path + file_code, 'w+')
